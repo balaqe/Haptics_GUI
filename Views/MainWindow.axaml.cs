@@ -4,6 +4,7 @@ using System.Diagnostics;
 using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 
+
 namespace Haptics_GUI.Views;
 
 public partial class MainWindow : Window

@@ -15,7 +15,6 @@
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-
     <StackPanel HorizontalAlignment="Center">
         <TextBox Name="OpenFileTextBox" Text="{Binding FilePath}"></TextBox>
         <Button Name="OpenFileButton" Content="Open file" HorizontalAlignment="Stretch"></Button> 
@@ -23,6 +22,5 @@
         <Button Name="StopFileButton" Content="Stop playing file" Command="{Binding StopFile}" HorizontalAlignment="Stretch"></Button>
         <Button Name="PlayGenFileButton" Content="Play Generated File" Command="{Binding PlayGenFile}" HorizontalAlignment="Stretch"></Button>
     </StackPanel>
-
 
 </Window>

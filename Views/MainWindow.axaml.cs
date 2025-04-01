@@ -57,6 +57,5 @@ public partial class MainWindow : Window
         }
         
         openFileTextBox = this.FindControl<TextBox>("OpenFileTextBox");
-        
     }
 }

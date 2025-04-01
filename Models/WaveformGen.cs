@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Haptics_GUI.Models.Functions;
+using Haptics_GUI.Models.Transitions;
 
 namespace Haptics_GUI.Models;
 
@@ -36,6 +37,13 @@ public class WaveformGen
 
         int offset = (int)((double)SamplingRate * start * BitDepth / 8);
         Array.Copy(sine.waveform, 0, ByteStreams[channelNo], offset, sine.waveform.Length);
+    }
+
+    public void LinearTrans(int channelNo, double startTime, double endTime, double startVal, double endVal)
+    {
+        Transition linear = new Linear(ByteStreams[channelNo], startTime, endTime, startVal, endVal, BitDepth, SamplingRate);
+        // Array.Copy(linear.resultData, 0, ByteStreams[channelNo], 0, linear.resultData.Length);
+        ByteStreams[channelNo] = linear.resultData;
     }
 
     private void spawnChannel (int channelNo, double dur, int start)

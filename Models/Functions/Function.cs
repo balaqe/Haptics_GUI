@@ -13,12 +13,11 @@ public abstract class Function
     public byte[] waveform;
     public abstract double Func(double inFreq, uint inSamplingRate, uint i);
 
-    public Function(double inFreq, double inDur, uint inChannel, uint inStart, uint inSamplingRate, uint inBitDepth)
+    public Function(double inFreq, double inDur, uint inChannel, uint inSamplingRate, uint inBitDepth)
     {
         freq = inFreq;
         dur = inDur;
         channel = inChannel;
-        start = inStart;
         samplingRate = inSamplingRate;
         bitDepth = inBitDepth;
         Generator();
@@ -26,16 +25,14 @@ public abstract class Function
 
     public void Generator()
     {
-        uint noOfSamples = (uint)((double)samplingRate * (dur + start));
-        uint samplesToStart = (uint)((double)samplingRate * start);
+        uint noOfSamples = (uint)((double)samplingRate * dur);
         uint byteLength = noOfSamples * bitDepth / 8;
-        // uint bytesToStart = samplesToStart * bitDepth / 8;
         
         waveform = new byte[byteLength];
 
-        for (uint i = samplesToStart; i < noOfSamples; i++)
+        for (uint i = 0; i < noOfSamples; i++)
         {
-            double sampleValue = Func(freq, samplingRate, i-samplesToStart);
+            double sampleValue = Func(freq, samplingRate, i);
 
             byte[] valueBytes;
             switch (bitDepth)

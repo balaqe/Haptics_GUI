@@ -49,8 +49,9 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         filePath = string.Empty;
         var waveFormGen = new WaveformGen();
-        waveFormGen.Sine(900.0, 5.0, 0, 0);
-        waveFormGen.Sine(400.0, 5.0, 1, 0);
-        byteStream = new ByteStream(waveFormGen.ByteStreams, new WaveFormat(44100, 16, 2));
+        waveFormGen.Sine(200.0, 1.0, 0, 0);
+        waveFormGen.Sine(200.0, 1.0, 0, 2);
+        // waveFormGen.Sine(400.0, 5.0, 2, 4);
+        byteStream = new ByteStream(waveFormGen.ByteStreams, new WaveFormat(44100, 16, 1));
     }
 }

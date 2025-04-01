@@ -31,9 +31,11 @@ public class WaveformGen
     public void Sine (double freq, double dur, uint channelNo, uint start)
     {
         spawnChannel(channelNo, dur, start);
-        Function sine = new Sine(freq, dur, channelNo, start, SamplingRate, BitDepth);
+        Function sine = new Sine(freq, dur, channelNo, SamplingRate, BitDepth);
         padChannels(dur);
-        Array.Copy(sine.waveform, 0, ByteStreams[(int)channelNo], 0, sine.waveform.Length);
+
+        uint offset = (uint)((double)SamplingRate * start) * BitDepth / 8;
+        Array.Copy(sine.waveform, 0, ByteStreams[(int)channelNo], offset, sine.waveform.Length);
     }
 
     private void spawnChannel (uint channelNo, double dur, uint start)
@@ -45,6 +47,12 @@ public class WaveformGen
         while (ByteStreams.Count <= channelNo) // Check if channel exists
         {
             ByteStreams.Add(new byte[byteLength]); // Create channels if needed
+        }
+
+        if (ByteStreams[(int)channelNo].Length < (int)byteLength) {
+            var temp = ByteStreams[(int)channelNo];
+            Array.Resize(ref temp, (int)byteLength);
+            ByteStreams[(int)channelNo] = temp;
         }
     }
 

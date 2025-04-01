@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -68,10 +69,10 @@ public partial class MainWindowViewModel : ViewModelBase
             var waveFormGen = new WaveformGen();
             waveFormGen.Sine(200.0, 5.0, 0, 0);
             // waveFormGen.LinearTrans(0, 0, 0.3, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
-            waveFormGen.LinearTrans(0, 2.5, 5, 1, 0); 
-            
-            FunctionDictionary.Add("SineStep", new ByteStream(waveFormGen.ByteStreams, 
-                new WaveFormat(44100, 16, 2))); 
+            waveFormGen.LinearTrans(0, 2.5, 5, 1, 0);
+
+            FunctionDictionary["SineStep"] = new ByteStream(waveFormGen.ByteStreams,
+                new WaveFormat(44100, 16, 1));
             FunctionDictionary["SineStep"].Play();
         }
         else
@@ -83,13 +84,8 @@ public partial class MainWindowViewModel : ViewModelBase
             waveFormGen.LinearTrans(0, 2.5, 5, 1, 0); 
             
             FunctionDictionary.Add("SineStep", new ByteStream(waveFormGen.ByteStreams, 
-                new WaveFormat(44100, 16, 2))); 
+                new WaveFormat(44100, 16, 1))); 
             FunctionDictionary["SineStep"].Play();
-            while (FunctionDictionary["SineStep"].WasapiOut.PlaybackState == PlaybackState.Playing)
-            {
-                System.Threading.Thread.Sleep(100);
-            }
-            FunctionDictionary["SineStep"].Dispose();
         }
     }
     

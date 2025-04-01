@@ -70,6 +70,8 @@ public partial class MainWindowViewModel : ViewModelBase
             waveFormGen.Sine(200.0, 5.0, 0, 0);
             // waveFormGen.LinearTrans(0, 0, 0.3, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
             waveFormGen.LinearTrans(0, 2.5, 5, 1, 0);
+            waveFormGen.LinearTrans(0, 0, 2.5, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
+            waveFormGen.LinearTrans(0, 5, 7.5, 1, 0); 
 
             FunctionDictionary["SineStep"] = new ByteStream(waveFormGen.ByteStreams,
                 new WaveFormat(44100, 16, 1));
@@ -80,7 +82,7 @@ public partial class MainWindowViewModel : ViewModelBase
             
             var waveFormGen = new WaveformGen();
             waveFormGen.Sine(200.0, 5.0, 0, 0);
-            // waveFormGen.LinearTrans(0, 0, 0.3, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
+            waveFormGen.LinearTrans(0, 0, 2.5, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
             waveFormGen.LinearTrans(0, 2.5, 5, 1, 0); 
             
             FunctionDictionary.Add("SineStep", new ByteStream(waveFormGen.ByteStreams, 

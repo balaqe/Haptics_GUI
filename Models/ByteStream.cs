@@ -10,7 +10,7 @@ namespace Haptics_GUI.Models;
 public class ByteStream
 {
     private MultiplexingWaveProvider WaveProvider { get; }
-    private WasapiOut WasapiOut { get; set; }
+    public WasapiOut WasapiOut { get; set; }
 
     private List<RawSourceWaveStream> Waves;
     

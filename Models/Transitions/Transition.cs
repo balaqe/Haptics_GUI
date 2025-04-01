@@ -34,6 +34,7 @@ public abstract class Transition
     public void Generator()
     {
         resultData = new byte[data.Length];
+        Array.Copy(data, resultData, data.Length);
 
         int bytesPerSample = bitDepth / 8;
         int startSample = (int)(startTime * samplesPerSecond);

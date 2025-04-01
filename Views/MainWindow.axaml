@@ -21,6 +21,7 @@
         <Button Name="PlayFileButton" Content="Play file" Command="{Binding PlayFile}" HorizontalAlignment="Stretch"></Button>
         <Button Name="StopFileButton" Content="Stop playing file" Command="{Binding StopFile}" HorizontalAlignment="Stretch"></Button>
         <Button Name="PlayGenFileButton" Content="Play Generated File" Command="{Binding PlayGenFile}" HorizontalAlignment="Stretch"></Button>
+        <Button Name="StopGenFileButton" Content="Stop Generated File" Command="{Binding StopGenFile}" HorizontalAlignment="Stretch"></Button>
     </StackPanel>
 
 </Window>

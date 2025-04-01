@@ -46,8 +46,10 @@ public class Sine : Function
             }
             
             uint byteIndex = i * (bitDepth / 8);
-            for (int j = 0; j < bitDepth; j += 8)
+            for (int j = 0; j < bitDepth/8; j += 1)
             {
+                // Console.WriteLine($"waveForm[byteIndex + j] {byteIndex + j}");
+                // Console.WriteLine($"valueBytes[j] {j}");
                 waveform[byteIndex + j] = valueBytes[j];
             }
         }

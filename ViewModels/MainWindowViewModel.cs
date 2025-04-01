@@ -12,12 +12,19 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty] public string filePath;
     private AudioFileReader audioFile;
     private WasapiOut audioOut;
+    private ByteStream byteStream;
 
 
     [RelayCommand]
     public void PlayGenFile()
     {
-        SineGen.PlaySine();
+        byteStream.Play();
+    }
+
+    [RelayCommand]
+    public void StopGenFile()
+    {
+        byteStream.Stop();
     }
 
 
@@ -41,5 +48,9 @@ public partial class MainWindowViewModel : ViewModelBase
     public MainWindowViewModel()
     {
         filePath = string.Empty;
+        var waveFormGen = new WaveformGen();
+        waveFormGen.Sine(900.0, 5.0, 0, 0);
+        waveFormGen.Sine(400.0, 5.0, 1, 0);
+        byteStream = new ByteStream(waveFormGen.ByteStreams, new WaveFormat(44100, 16, 2));
     }
 }

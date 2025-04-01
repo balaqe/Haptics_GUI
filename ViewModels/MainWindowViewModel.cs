@@ -15,6 +15,13 @@ public partial class MainWindowViewModel : ViewModelBase
 
 
     [RelayCommand]
+    public void PlayGenFile()
+    {
+        SineGen.PlaySine();
+    }
+
+
+    [RelayCommand]
     public void PlayFile()
     {
         audioFile = new AudioFileReader(filePath);

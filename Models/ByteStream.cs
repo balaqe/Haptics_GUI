@@ -10,37 +10,40 @@ namespace Haptics_GUI.Models;
 public class ByteStream
 {
     private MultiplexingWaveProvider WaveProvider { get; }
-    private WasapiOut WasapiOut { get; }
+    private WasapiOut WasapiOut { get; set; }
+
+    private List<RawSourceWaveStream> Waves;
     
     private WaveFormat WaveFormat { get; init; }
 
-    public ByteStream(List<byte[]?> SampleArrays, WaveFormat? waveFormat)
+    public ByteStream(List<byte[]> sampleArrays, WaveFormat waveFormat)
     {
         // If samples are not present, nothing can be played
-        ArgumentNullException.ThrowIfNull(SampleArrays);
-        foreach (var samples in SampleArrays)
+        ArgumentNullException.ThrowIfNull(sampleArrays);
+        foreach (var samples in sampleArrays)
         {
             ArgumentNullException.ThrowIfNull(samples);
         }
 
-        if (waveFormat.Channels != SampleArrays.Count)
+        ArgumentNullException.ThrowIfNull(waveFormat);
+        if (waveFormat.Channels != sampleArrays.Count)
         {
             throw new ArgumentException($"Number of channels do not match: " +
-                                        $"SampleArrays.Count = {SampleArrays.Count}" +
+                                        $"sampleArrays.Count = {sampleArrays.Count}" +
                                         $" != " +
                                         $"waveFormat.Channels = {waveFormat.Channels}");
         }
 
         // If WaveFormat is not passed in default will be 44.1kHz and mono
-        WaveFormat = waveFormat != null ? waveFormat : new WaveFormat(44100, 1);
+        WaveFormat = waveFormat;
 
-        List<RawSourceWaveStream> waves = [];
-        foreach (var samples in SampleArrays)
+        Waves = [];
+        foreach (var samples in sampleArrays)
         {
-            waves.Add(new RawSourceWaveStream(new MemoryStream(samples), 
+            Waves.Add(new RawSourceWaveStream(new MemoryStream(samples), 
                 new WaveFormat(WaveFormat.SampleRate, 1)));
         }
-        WaveProvider = new MultiplexingWaveProvider(waves, WaveFormat.Channels);
+        WaveProvider = new MultiplexingWaveProvider(Waves, WaveFormat.Channels);
         WasapiOut = new WasapiOut(AudioClientShareMode.Exclusive, true, 200);
         WasapiOut.Init(WaveProvider);
     }

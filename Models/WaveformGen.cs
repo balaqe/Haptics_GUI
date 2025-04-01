@@ -7,7 +7,7 @@ namespace Haptics_GUI.Models;
 
 public class WaveformGen
 {
-    public uint SamplingRate;
+    public int SamplingRate;
     public byte BitDepth;
     public List<byte[]> ByteStreams;
     private double longestTrack;
@@ -22,36 +22,43 @@ public class WaveformGen
 
     public WaveformGen(int samplingRate, int bitDepth) // Custom constructor
     {
-        SamplingRate = (uint)samplingRate;
+        SamplingRate = samplingRate;
         BitDepth = (byte)bitDepth;
         longestTrack = 0;
         ByteStreams = new List<byte[]>();
     }
 
-    public void Sine (double freq, double dur, uint channelNo, uint start)
+    public void Sine (double freq, double dur, int channelNo, int start)
     {
         spawnChannel(channelNo, dur, start);
-        Function sine = new Sine(freq, dur, channelNo, start, SamplingRate, BitDepth);
+        Function sine = new Sine(freq, dur, channelNo, SamplingRate, BitDepth);
         padChannels(dur);
-        Array.Copy(sine.waveform, 0, ByteStreams[(int)channelNo], 0, sine.waveform.Length);
+
+        int offset = (int)((double)SamplingRate * start * BitDepth / 8);
+        Array.Copy(sine.waveform, 0, ByteStreams[channelNo], offset, sine.waveform.Length);
     }
 
-    private void spawnChannel (uint channelNo, double dur, uint start)
+    private void spawnChannel (int channelNo, double dur, int start)
     {
-        uint noOfSamples = (uint)((double)SamplingRate * (dur + start));
-        uint byteLength = noOfSamples * BitDepth / 8;
-        // uint byteLength = SamplingRate * (uint)dur * BitDepth / 8;
+        int noOfSamples = (int)((double)SamplingRate * (dur + start));
+        int  byteLength = noOfSamples * BitDepth / 8;
         
         while (ByteStreams.Count <= channelNo) // Check if channel exists
         {
             ByteStreams.Add(new byte[byteLength]); // Create channels if needed
+        }
+
+        if (ByteStreams[channelNo].Length < byteLength) {
+            var temp = ByteStreams[channelNo];
+            Array.Resize(ref temp, byteLength);
+            ByteStreams[channelNo] = temp;
         }
     }
 
     private void padChannels (double dur)
     {
         if (dur > longestTrack) longestTrack = dur;
-        int newSize = (int)(SamplingRate * longestTrack * BitDepth / 8);
+        int newSize = (int)(SamplingRate * longestTrack * BitDepth) / 8;
 
         for (int i=0; i<ByteStreams.Count; i++) // Not foreach because we need the index
         {

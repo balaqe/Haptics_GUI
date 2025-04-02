@@ -13,6 +13,8 @@ public abstract class Transition
     public double dur;
     public int bitDepth;
     public int samplesPerSecond;
+    public int startSample;
+    public int endSample;
 
     public abstract double Func(int i);
 
@@ -27,8 +29,10 @@ public abstract class Transition
         bitDepth = inBitDepth;
         dur = endTime - startTime;
         samplesPerSecond = inSampRate;
+        startSample = (int)(startTime * samplesPerSecond);
+        endSample = (int)(endTime * samplesPerSecond);
 
-        Generator();
+        // Generator();
     }
 
     public void Generator()

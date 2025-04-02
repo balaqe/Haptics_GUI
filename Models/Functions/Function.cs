@@ -20,7 +20,7 @@ public abstract class Function
         channel = inChannel;
         samplingRate = inSamplingRate;
         bitDepth = inBitDepth;
-        Generator();
+        // Generator();
     }
 
     public void Generator()

@@ -10,7 +10,7 @@ public class Sine : Function
 
     public override double Func(double inFreq, int inSamplingRate, int i)
     {
-        double omega = 2*Math.PI*inFreq/(double)inSamplingRate;
+        double omega = 2*Math.PI*inFreq/(double)inSamplingRate; // Calculate period
         return Math.Sin(omega * i);
     }
 }

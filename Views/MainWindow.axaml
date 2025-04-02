@@ -148,6 +148,22 @@
                 </Grid>
             </StackPanel>
         </Border>
+        <Border Margin="5" BorderBrush="Black" BorderThickness="1" CornerRadius="10">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <StackPanel>
+                    <TextBlock Text="Duration" Margin="5"/>
+                    <TextBox Margin="10" Text="{Binding Duration}"/>
+                </StackPanel>
+                <StackPanel>
+                    <TextBlock Text="FastSmooth" Margin="5"/>
+                    <TextBox Margin="10" Text="{Binding FastSmooth}"/>
+                </StackPanel>
+                <StackPanel>
+                    <TextBlock Text="SlowSmooth" Margin="5"/>
+                    <TextBox Margin="10" Text="{Binding SlowSmooth}"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
     </StackPanel>
 
     </StackPanel>

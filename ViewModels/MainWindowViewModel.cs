@@ -12,6 +12,9 @@ namespace Haptics_GUI.ViewModels;
 public partial class MainWindowViewModel : ViewModelBase
 {
     [ObservableProperty] public string filePath;
+    [ObservableProperty] public double duration;
+    [ObservableProperty] public double fastSmooth;
+    [ObservableProperty] public double slowSmooth;
     private AudioFileReader audioFile;
     private WasapiOut audioOut;
 
@@ -53,6 +56,9 @@ public partial class MainWindowViewModel : ViewModelBase
     public MainWindowViewModel()
     {
         filePath = string.Empty;
+        duration = 0.5;
+        fastSmooth = 0.1;
+        slowSmooth = 0.25;
         
         FunctionDictionary = new Dictionary<string, ByteStream>();
     }
@@ -62,30 +68,16 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     public void SineStepPlay()
     {
-        if (FunctionDictionary.ContainsKey("SineStep"))
-        {
-            FunctionDictionary["SineStep"].Dispose();
-            FunctionDictionary.Remove("SineStep");  // Remove the key after disposing
-            SineStepHelper(); 
-           
-        }
-        else
-        {
-            SineStepHelper(); 
-        }
-    }
+        Reset();
 
-    private void SineStepHelper()
-    {
         var waveFormGen = new WaveformGen();
-        waveFormGen.Sine(100.0, 0.5, 5, 0);
-        waveFormGen.Sine(100.0, 0.5, 1, 0);
+        waveFormGen.Sine(100.0, duration, 5, 0);
+        waveFormGen.Sine(100.0, duration, 1, 0);
         
         FunctionDictionary.Add("SineStep", new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat)); 
         FunctionDictionary["SineStep"].Play();
-        // FunctionDictionary["SineStep"].Dispose();
     }
-    
+
     [RelayCommand]
     public void SineStepStop()
     {
@@ -99,24 +91,12 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     public void SineLinearFastPlay()
     {
-        if (FunctionDictionary.ContainsKey("SineLinearFast"))
-        {
-            FunctionDictionary["SineLinearFast"].Dispose();
-            FunctionDictionary.Remove("SineLinearFast");  // Remove the key after disposing
-            SineLinearFastHelper();
-        }
-        else
-        {
-            SineLinearFastHelper();
-        }
-    }
-    
-    private void SineLinearFastHelper()
-    {
+        Reset();
+
         var waveFormGen = new WaveformGen();
-        waveFormGen.Sine(100.0, 0.5, 0, 0);
-        waveFormGen.LinearTrans(0, 0, 0.1, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
-        waveFormGen.LinearTrans(0, 0.4, 0.5, 1, 0);
+        waveFormGen.Sine(100.0, duration, 0, 0);
+        waveFormGen.LinearTrans(0, 0, fastSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
+        waveFormGen.LinearTrans(0, (duration-fastSmooth), duration, 1, 0);
         FunctionDictionary.Add("SineLinearFast", new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat)); 
         FunctionDictionary["SineLinearFast"].Play();
     }
@@ -134,28 +114,16 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     public void SineLinearSlowPlay()
     {
-        if (FunctionDictionary.ContainsKey("SineLinearSlow"))
-        {
-            FunctionDictionary["SineLinearSlow"].Dispose();
-            FunctionDictionary.Remove("SineLinearSlow");  // Remove the key after disposing
-            SineLinearSlowHelper();
-        }
-        else
-        {
-            SineLinearSlowHelper();
-        }
-    }
+        Reset();
 
-    private void SineLinearSlowHelper()
-    {
         var waveFormGen = new WaveformGen();
-        waveFormGen.Sine(100.0, 0.5, 0, 0);
-        waveFormGen.LinearTrans(0, 0, 0.25, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
-        waveFormGen.LinearTrans(0, 0.25, 0.5, 1, 0);
+        waveFormGen.Sine(100.0, duration, 0, 0);
+        waveFormGen.LinearTrans(0, 0, slowSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
+        waveFormGen.LinearTrans(0, (duration-slowSmooth), duration, 1, 0);
         FunctionDictionary.Add("SineLinearSlow", new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat)); 
         FunctionDictionary["SineLinearSlow"].Play();
     }
-    
+
     [RelayCommand]
     public void SineLinearSlowStop()
     {
@@ -169,25 +137,12 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     public void SineSmoothFastPlay()
     {
-        if (FunctionDictionary.ContainsKey("SineSmoothFast"))
-        {
-            FunctionDictionary["SineSmoothFast"].Dispose();
-            SineSmoothFastHelper();
-        }
-        else
-        {
-            SineSmoothFastHelper();
-        }
-    }
+        Reset();
 
-    private void SineSmoothFastHelper()
-    {
         var waveFormGen = new WaveformGen();
-        waveFormGen.Sine(200.0, 5.0, 0, 0);
-        waveFormGen.SigmoidTrans(0, 0, 2.5, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
-        waveFormGen.SigmoidTrans(0, 2.5, 5, 1, 0);
-        // waveFormGen.SigmoidTrans(0, 5, 7.5, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
-        // waveFormGen.SigmoidTrans(0, 7.5, 10, 1, 0); 
+        waveFormGen.Sine(100.0, duration, 0, 0);
+        waveFormGen.SigmoidTrans(0, 0, fastSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
+        waveFormGen.SigmoidTrans(0, (duration-fastSmooth), duration, 1, 0);
         FunctionDictionary.Add("SineSmoothFast", new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat)); 
         FunctionDictionary["SineSmoothFast"].Play();
     }
@@ -195,17 +150,33 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     public void SineSmoothFastStop()
     {
+        if (FunctionDictionary.ContainsKey("SineSmoothFast"))
+        {
+            FunctionDictionary["SineSmoothFast"].Dispose();
+        }
     }
     
     
     [RelayCommand]
     public void SineSmoothSlowPlay()
     {
+        Reset();
+
+        var waveFormGen = new WaveformGen();
+        waveFormGen.Sine(100.0, duration, 0, 0);
+        waveFormGen.SigmoidTrans(0, 0, slowSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
+        waveFormGen.SigmoidTrans(0, (duration-slowSmooth), duration, 1, 0);
+        FunctionDictionary.Add("SineSmoothSlow", new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat)); 
+        FunctionDictionary["SineSmoothSlow"].Play();
     }
     
     [RelayCommand]
     public void SineSmoothSlowStop()
     {
+        if (FunctionDictionary.ContainsKey("SineSmoothSlow"))
+        {
+            FunctionDictionary["SineSmoothSlow"].Dispose();
+        }
     }
     
     
@@ -215,26 +186,12 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     public void SquareStepPlay()
     {
-        if (FunctionDictionary.ContainsKey("SquareStep"))
-        {
-            FunctionDictionary["SquareStep"].Dispose();
-            FunctionDictionary.Remove("SquareStep");  // Remove the key after disposing
-            SquareStepHelper();   
-        }
-        else
-        {
-            SquareStepHelper();
-        }
-    }
+        Reset();
 
-    private void SquareStepHelper()
-    {
         var waveFormGen = new WaveformGen();
-        waveFormGen.Square(200.0, 0.5, 0, 0);
-        
+        waveFormGen.Square(100.0, duration, 0, 0);
         FunctionDictionary.Add("SquareStep", new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat)); 
         FunctionDictionary["SquareStep"].Play();
-        
     }
     
     [RelayCommand]
@@ -250,22 +207,46 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     public void SquareLinearFastPlay()
     {
+        Reset();
+
+        var waveFormGen = new WaveformGen();
+        waveFormGen.Square(100.0, duration, 0, 0);
+        waveFormGen.LinearTrans(0, 0, fastSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
+        waveFormGen.LinearTrans(0, (duration-fastSmooth), duration, 1, 0);
+        FunctionDictionary.Add("SquareLinearFast", new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat)); 
+        FunctionDictionary["SquareLinearFast"].Play();
     }
     
     [RelayCommand]
     public void SquareLinearFastStop()
     {
+        if (FunctionDictionary.ContainsKey("SquareLinearFast"))
+        {
+            FunctionDictionary["SquareLinearFast"].Dispose();
+        }
     }
     
     
     [RelayCommand]
     public void SquareLinearSlowPlay()
     {
+        Reset();
+
+        var waveFormGen = new WaveformGen();
+        waveFormGen.Square(100.0, duration, 0, 0);
+        waveFormGen.LinearTrans(0, 0, slowSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
+        waveFormGen.LinearTrans(0, (duration-slowSmooth), duration, 1, 0);
+        FunctionDictionary.Add("SquareLinearSlow", new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat)); 
+        FunctionDictionary["SquareLinearSlow"].Play();
     }
     
     [RelayCommand]
     public void SquareLinearSlowStop()
     {
+        if (FunctionDictionary.ContainsKey("SquareLinearSlow"))
+        {
+            FunctionDictionary["SquareLinearSlow"].Dispose();
+        }
     }
     
     
@@ -273,21 +254,55 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     public void SquareSmoothFastPlay()
     {
+        Reset();
+
+        var waveFormGen = new WaveformGen();
+        waveFormGen.Square(100.0, duration, 0, 0);
+        waveFormGen.SigmoidTrans(0, 0, fastSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
+        waveFormGen.SigmoidTrans(0, (duration-fastSmooth), duration, 1, 0);
+        FunctionDictionary.Add("SquareSmoothFast", new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat)); 
+        FunctionDictionary["SquareSmoothFast"].Play();
     }
     
     [RelayCommand]
     public void SquareSmoothFastStop()
     {
+        if (FunctionDictionary.ContainsKey("SquareSmoothFast"))
+        {
+            FunctionDictionary["SquareSmoothFast"].Dispose();
+        }
     }
     
     
     [RelayCommand]
     public void SquareSmoothSlowPlay()
     {
+        Reset();
+
+        var waveFormGen = new WaveformGen();
+        waveFormGen.Square(100.0, duration, 0, 0);
+        waveFormGen.SigmoidTrans(0, 0, slowSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
+        waveFormGen.SigmoidTrans(0, (duration-slowSmooth), duration, 1, 0);
+        FunctionDictionary.Add("SquareSmoothSlow", new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat)); 
+        FunctionDictionary["SquareSmoothSlow"].Play();
     }
     
     [RelayCommand]
     public void SquareSmoothSlowStop()
     {
+        if (FunctionDictionary.ContainsKey("SquareSmoothFlow"))
+        {
+            FunctionDictionary["SquareSmoothSlow"].Dispose();
+        }
+    }
+
+    private void Reset()
+    {
+        foreach (KeyValuePair<string, ByteStream> entry in FunctionDictionary)
+        {
+            entry.Value.Dispose();
+        }
+
+        if (FunctionDictionary.Count > 0) FunctionDictionary.Clear();
     }
 }

@@ -13,8 +13,12 @@ public partial class MainWindowViewModel : ViewModelBase
 {
     [ObservableProperty] public string filePath;
     [ObservableProperty] public double duration;
+    [ObservableProperty] public double fastDuration;
+    [ObservableProperty] public double slowDuration;
     [ObservableProperty] public double fastSmooth;
     [ObservableProperty] public double slowSmooth;
+    [ObservableProperty] public double squareAmp;
+
     private AudioFileReader audioFile;
     private WasapiOut audioOut;
 
@@ -56,9 +60,12 @@ public partial class MainWindowViewModel : ViewModelBase
     public MainWindowViewModel()
     {
         filePath = string.Empty;
-        duration = 0.5;
+        duration = 0.2;
+        fastDuration = 0.2;
+        slowDuration = 0.5;
         fastSmooth = 0.1;
         slowSmooth = 0.25;
+        squareAmp = 0.81;
         
         FunctionDictionary = new Dictionary<string, ByteStream>();
     }
@@ -94,9 +101,12 @@ public partial class MainWindowViewModel : ViewModelBase
         Reset();
 
         var waveFormGen = new WaveformGen();
-        waveFormGen.Sine(100.0, duration, 0, 0);
-        waveFormGen.LinearTrans(0, 0, fastSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
-        waveFormGen.LinearTrans(0, (duration-fastSmooth), duration, 1, 0);
+        waveFormGen.Sine(100.0, fastDuration, 5, 0);
+        waveFormGen.LinearTrans(5, 0, fastSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
+        waveFormGen.LinearTrans(5, (fastDuration-fastSmooth), fastDuration, 1, 0);
+        waveFormGen.Sine(100.0, fastDuration, 1, 0);
+        waveFormGen.LinearTrans(1, 0, fastSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
+        waveFormGen.LinearTrans(1, (fastDuration-fastSmooth), fastDuration, 1, 0);
         FunctionDictionary.Add("SineLinearFast", new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat)); 
         FunctionDictionary["SineLinearFast"].Play();
     }
@@ -117,9 +127,12 @@ public partial class MainWindowViewModel : ViewModelBase
         Reset();
 
         var waveFormGen = new WaveformGen();
-        waveFormGen.Sine(100.0, duration, 0, 0);
-        waveFormGen.LinearTrans(0, 0, slowSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
-        waveFormGen.LinearTrans(0, (duration-slowSmooth), duration, 1, 0);
+        waveFormGen.Sine(100.0, slowDuration, 5, 0);
+        waveFormGen.LinearTrans(5, 0, slowSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
+        waveFormGen.LinearTrans(5, (slowDuration-slowSmooth), slowDuration, 1, 0);
+        waveFormGen.Sine(100.0, slowDuration, 1, 0);
+        waveFormGen.LinearTrans(1, 0, slowSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
+        waveFormGen.LinearTrans(1, (slowDuration-slowSmooth), slowDuration, 1, 0);
         FunctionDictionary.Add("SineLinearSlow", new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat)); 
         FunctionDictionary["SineLinearSlow"].Play();
     }
@@ -140,9 +153,12 @@ public partial class MainWindowViewModel : ViewModelBase
         Reset();
 
         var waveFormGen = new WaveformGen();
-        waveFormGen.Sine(100.0, duration, 0, 0);
-        waveFormGen.SigmoidTrans(0, 0, fastSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
-        waveFormGen.SigmoidTrans(0, (duration-fastSmooth), duration, 1, 0);
+        waveFormGen.Sine(100.0, fastDuration, 5, 0);
+        waveFormGen.SigmoidTrans(5, 0, fastSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
+        waveFormGen.SigmoidTrans(5, (fastDuration-fastSmooth), fastDuration, 1, 0);
+        waveFormGen.Sine(100.0, fastDuration, 1, 0);
+        waveFormGen.SigmoidTrans(1, 0, fastSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
+        waveFormGen.SigmoidTrans(1, (fastDuration-fastSmooth), fastDuration, 1, 0);
         FunctionDictionary.Add("SineSmoothFast", new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat)); 
         FunctionDictionary["SineSmoothFast"].Play();
     }
@@ -163,9 +179,12 @@ public partial class MainWindowViewModel : ViewModelBase
         Reset();
 
         var waveFormGen = new WaveformGen();
-        waveFormGen.Sine(100.0, duration, 0, 0);
-        waveFormGen.SigmoidTrans(0, 0, slowSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
-        waveFormGen.SigmoidTrans(0, (duration-slowSmooth), duration, 1, 0);
+        waveFormGen.Sine(100.0, slowDuration, 5, 0);
+        waveFormGen.SigmoidTrans(5, 0, slowSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
+        waveFormGen.SigmoidTrans(5, (slowDuration-slowSmooth), slowDuration, 1, 0);
+        waveFormGen.Sine(100.0, slowDuration, 1, 0);
+        waveFormGen.SigmoidTrans(1, 0, slowSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
+        waveFormGen.SigmoidTrans(1, (slowDuration-slowSmooth), slowDuration, 1, 0);
         FunctionDictionary.Add("SineSmoothSlow", new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat)); 
         FunctionDictionary["SineSmoothSlow"].Play();
     }
@@ -189,7 +208,10 @@ public partial class MainWindowViewModel : ViewModelBase
         Reset();
 
         var waveFormGen = new WaveformGen();
-        waveFormGen.Square(100.0, duration, 0, 0);
+        waveFormGen.Square(100.0, duration, 5, 0);
+        waveFormGen.Square(100.0, duration, 1, 0);
+        waveFormGen.LinearTrans(5, 0, duration, squareAmp, squareAmp);
+        waveFormGen.LinearTrans(1, 0, duration, squareAmp, squareAmp);
         FunctionDictionary.Add("SquareStep", new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat)); 
         FunctionDictionary["SquareStep"].Play();
     }
@@ -210,9 +232,14 @@ public partial class MainWindowViewModel : ViewModelBase
         Reset();
 
         var waveFormGen = new WaveformGen();
-        waveFormGen.Square(100.0, duration, 0, 0);
-        waveFormGen.LinearTrans(0, 0, fastSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
-        waveFormGen.LinearTrans(0, (duration-fastSmooth), duration, 1, 0);
+        waveFormGen.Square(100.0, fastDuration, 5, 0);
+        waveFormGen.LinearTrans(5, 0, fastSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
+        waveFormGen.LinearTrans(5, (fastDuration-fastSmooth), fastDuration, 1, 0);
+        waveFormGen.Square(100.0, fastDuration, 1, 0);
+        waveFormGen.LinearTrans(1, 0, fastSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
+        waveFormGen.LinearTrans(1, (fastDuration-fastSmooth), fastDuration, 1, 0);
+        waveFormGen.LinearTrans(5, 0, duration, squareAmp, squareAmp);
+        waveFormGen.LinearTrans(1, 0, duration, squareAmp, squareAmp);
         FunctionDictionary.Add("SquareLinearFast", new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat)); 
         FunctionDictionary["SquareLinearFast"].Play();
     }
@@ -233,9 +260,14 @@ public partial class MainWindowViewModel : ViewModelBase
         Reset();
 
         var waveFormGen = new WaveformGen();
-        waveFormGen.Square(100.0, duration, 0, 0);
-        waveFormGen.LinearTrans(0, 0, slowSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
-        waveFormGen.LinearTrans(0, (duration-slowSmooth), duration, 1, 0);
+        waveFormGen.Square(100.0, slowDuration, 5, 0);
+        waveFormGen.LinearTrans(5, 0, slowSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
+        waveFormGen.LinearTrans(5, (slowDuration-slowSmooth), slowDuration, 1, 0);
+        waveFormGen.Square(100.0, slowDuration, 1, 0);
+        waveFormGen.LinearTrans(1, 0, slowSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
+        waveFormGen.LinearTrans(1, (slowDuration-slowSmooth), slowDuration, 1, 0);
+        waveFormGen.LinearTrans(5, 0, duration, squareAmp, squareAmp);
+        waveFormGen.LinearTrans(1, 0, duration, squareAmp, squareAmp);
         FunctionDictionary.Add("SquareLinearSlow", new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat)); 
         FunctionDictionary["SquareLinearSlow"].Play();
     }
@@ -257,9 +289,14 @@ public partial class MainWindowViewModel : ViewModelBase
         Reset();
 
         var waveFormGen = new WaveformGen();
-        waveFormGen.Square(100.0, duration, 0, 0);
-        waveFormGen.SigmoidTrans(0, 0, fastSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
-        waveFormGen.SigmoidTrans(0, (duration-fastSmooth), duration, 1, 0);
+        waveFormGen.Square(100.0, fastDuration, 5, 0);
+        waveFormGen.SigmoidTrans(5, 0, fastSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
+        waveFormGen.SigmoidTrans(5, (fastDuration-fastSmooth), fastDuration, 1, 0);
+        waveFormGen.Square(100.0, fastDuration, 1, 0);
+        waveFormGen.SigmoidTrans(1, 0, fastSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
+        waveFormGen.SigmoidTrans(1, (fastDuration-fastSmooth), fastDuration, 1, 0);
+        waveFormGen.LinearTrans(5, 0, duration, squareAmp, squareAmp);
+        waveFormGen.LinearTrans(1, 0, duration, squareAmp, squareAmp);
         FunctionDictionary.Add("SquareSmoothFast", new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat)); 
         FunctionDictionary["SquareSmoothFast"].Play();
     }
@@ -280,9 +317,14 @@ public partial class MainWindowViewModel : ViewModelBase
         Reset();
 
         var waveFormGen = new WaveformGen();
-        waveFormGen.Square(100.0, duration, 0, 0);
-        waveFormGen.SigmoidTrans(0, 0, slowSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
-        waveFormGen.SigmoidTrans(0, (duration-slowSmooth), duration, 1, 0);
+        waveFormGen.Square(100.0, slowDuration, 5, 0);
+        waveFormGen.SigmoidTrans(5, 0, slowSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
+        waveFormGen.SigmoidTrans(5, (slowDuration-slowSmooth), slowDuration, 1, 0);
+        waveFormGen.Square(100.0, slowDuration, 1, 0);
+        waveFormGen.SigmoidTrans(1, 0, slowSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
+        waveFormGen.SigmoidTrans(1, (slowDuration-slowSmooth), slowDuration, 1, 0);
+        waveFormGen.LinearTrans(5, 0, duration, squareAmp, squareAmp);
+        waveFormGen.LinearTrans(1, 0, duration, squareAmp, squareAmp);
         FunctionDictionary.Add("SquareSmoothSlow", new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat)); 
         FunctionDictionary["SquareSmoothSlow"].Play();
     }

@@ -14,7 +14,7 @@ namespace Haptics_GUI.ViewModels;
 public partial class MainWindowViewModel : ViewModelBase
 {
 
-    [DllImport("soundPlayer.dll", CallingConvention=System.Runtime.InteropServices.CallingConvention.StdCall)]
+    [DllImport("Lib/soundPlayer.dll", CallingConvention=System.Runtime.InteropServices.CallingConvention.StdCall)]
     public static extern int play(float[] waveform, int n);
 
     [ObservableProperty] public string filePath;

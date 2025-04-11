@@ -56,99 +56,46 @@
  * license above.
  */
 #include <stdio.h>
+// #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <math.h>
 #include "portaudio.h"
 
-#define NUM_SECONDS   (1)
-#define SAMPLE_RATE   (44100)
-#define FRAMES_PER_BUFFER  (64)
+#define NUM_SECONDS         (1)
+#define SAMPLE_RATE         (44100)
+#define FRAMES_PER_BUFFER   (1)
 
 #ifndef M_PI
 #define M_PI  (3.14159265)
 #endif
 
 #define TABLE_SIZE   (200)
-typedef struct
-{
-    float *sine;
-    unsigned long len;
-    int left_phase;
-    int right_phase;
-    char message[20];
-}
-paTestData;
 
-/* This routine will be called by the PortAudio engine when audio is needed.
-** It may called at interrupt level on some machines so don't do anything
-** that could mess up the system like calling malloc() or free().
-*/
-static int patestCallback( const void *inputBuffer, void *outputBuffer,
-                            unsigned long framesPerBuffer,
-                            const PaStreamCallbackTimeInfo* timeInfo,
-                            PaStreamCallbackFlags statusFlags,
-                            void *userData )
-{
-    paTestData *data = (paTestData*)userData;
-    float *out = (float*)outputBuffer;
-    unsigned long i;
-
-    (void) timeInfo; /* Prevent unused variable warnings. */
-    (void) statusFlags;
-    (void) inputBuffer;
-    
-    *out += data->len;
-    
-    for( i=0; i<framesPerBuffer; i++ )
-    {
-        *out++ = data->sine[data->left_phase];  /* left */
-        *out++ = data->sine[data->right_phase];  /* right */
-        data->left_phase += 1;
-        if( data->left_phase >= TABLE_SIZE ) data->left_phase -= TABLE_SIZE;
-        data->right_phase += 3; /* higher pitch so we can distinguish left and right. */
-        if( data->right_phase >= TABLE_SIZE ) data->right_phase -= TABLE_SIZE;
-    }
-    
-    return paContinue;
-}
-
-/*
- * This routine is called by portaudio when playback is done.
- */
-static void StreamFinished( void* userData )
-{
-   paTestData *data = (paTestData *) userData;
-   printf( "Stream Completed: %s\n", data->message );
-}
 
 /*******************************************************************/
 int play(float *waveform, int n) {
     PaStreamParameters outputParameters;
     PaStream *stream;
     PaError err;
-    paTestData data;
-    int i;
-    
-    data.sine = malloc(sizeof(float) *n);
-    data.sine = waveform;
-    data.len = n;
-    
-//    for (int i=0; i<n; i++){
-//        printf("%.2f\n", waveform[i]);
-//    }
+    float buffer[FRAMES_PER_BUFFER][2]; /* stereo output buffer */
+    float debug_buff[n];
+    float sine[TABLE_SIZE]; /* sine wavetable */
+    int left_phase = 0;
+    int right_phase = 0;
+    int left_inc = 1;
+    int right_inc = 3; /* higher pitch so we can distinguish left and right. */
+    int i, j, k;
+    int bufferCount;
 
-    
-    printf("PortAudio Test: output sine wave. SR = %d, BufSize = %d\n", SAMPLE_RATE, FRAMES_PER_BUFFER);
-    
-    /* initialise sinusoidal wavetable */
-//    for( i=0; i<TABLE_SIZE; i++ )
-//    {
-//        data.sine[i] = (float) sin( ((double)i/(double)TABLE_SIZE) * M_PI * 2. );
-//    }
-//    data.sine = waveform;
-    
-    data.left_phase = data.right_phase = 0;
+    // DEBUG
+    FILE *wf_file;
+    // wf_file = fopen("waveform_log.csv", "w+");
+    wf_file = fopen("./Debug/input_wave_log.csv", "w+");
+    if (wf_file == NULL) printf("Could not open waveform_log.csv");
+    FILE *og_file;
+    // og_file = fopen("original_sine_log.csv", "w+");
+    og_file = fopen("./Debug/played_wave_log.csv", "w+");
+    if (wf_file == NULL) printf("Could not open original_sine_log.csv");
     
     err = Pa_Initialize();
     if( err != paNoError ) goto error;
@@ -160,7 +107,7 @@ int play(float *waveform, int n) {
     }
     outputParameters.channelCount = 2;       /* stereo output */
     outputParameters.sampleFormat = paFloat32; /* 32 bit floating point output */
-    outputParameters.suggestedLatency = Pa_GetDeviceInfo( outputParameters.device )->defaultLowOutputLatency;
+    outputParameters.suggestedLatency = 0.050; // Pa_GetDeviceInfo( outputParameters.device )->defaultLowOutputLatency;
     outputParameters.hostApiSpecificStreamInfo = NULL;
 
     err = Pa_OpenStream(
@@ -168,26 +115,49 @@ int play(float *waveform, int n) {
               NULL, /* no input */
               &outputParameters,
               SAMPLE_RATE,
-              n,
+              FRAMES_PER_BUFFER,
               paClipOff,      /* we won't output out of range samples so don't bother clipping them */
-              patestCallback,
-              &data );
+              NULL, /* no callback, use blocking API */
+              NULL ); /* no callback, so no callback userData */
     if( err != paNoError ) goto error;
 
-    sprintf( data.message, "No Message" );
-    err = Pa_SetStreamFinishedCallback( stream, &StreamFinished );
-    if( err != paNoError ) goto error;
 
+    // printf( "Play 3 times, higher each time.\n" );
+    
     err = Pa_StartStream( stream );
     if( err != paNoError ) goto error;
-    
-//    while ( err = Pa_IsStreamActive(stream) == 1);
 
-    printf("Play for %d seconds.\n", NUM_SECONDS );
-    Pa_Sleep( NUM_SECONDS * 1000 );
+    int count = 0;
+    // float debug_buff[bufferCount*FRAMES_PER_BUFFER];
+    bufferCount = n / FRAMES_PER_BUFFER;
+
+    for( i=0; i < bufferCount; i++ )
+    {
+        for( j=0; j < FRAMES_PER_BUFFER; j++ )
+        {
+            buffer[j][0] = waveform[count];
+            buffer[j][1] = waveform[count];
+            debug_buff[count] = buffer[j][0];
+            count++;
+        }
+
+        err = Pa_WriteStream( stream, buffer, FRAMES_PER_BUFFER );
+        if( err != paNoError ) goto error;
+    }   
+    // DEBUG
+    for (int k=0; k<n; k++) {
+        fprintf(wf_file, "%d,%.2f\n", k, waveform[k]);
+    }
+    for (int k=0; k<count; k++) {
+        fprintf(og_file, "%d,%.2f\n", k, debug_buff[k]);
+    }
+
+    fclose(wf_file);
+    fclose(og_file);
 
     err = Pa_StopStream( stream );
     if( err != paNoError ) goto error;
+
 
     err = Pa_CloseStream( stream );
     if( err != paNoError ) goto error;
@@ -195,19 +165,23 @@ int play(float *waveform, int n) {
     Pa_Terminate();
     printf("Test finished.\n");
     
-//    free(waveform);
-    
     return err;
+
 error:
-    Pa_Terminate();
     fprintf( stderr, "An error occured while using the portaudio stream\n" );
     fprintf( stderr, "Error number: %d\n", err );
     fprintf( stderr, "Error message: %s\n", Pa_GetErrorText( err ) );
-//    free(waveform);
-    return err;
-}
+	if( err == paUnanticipatedHostError )
+	{
+		const PaHostErrorInfo *hostErrorInfo = Pa_GetLastHostErrorInfo();
+		fprintf( stderr, "Host API error = #%ld, hostApiType = %d\n", hostErrorInfo->errorCode, hostErrorInfo->hostApiType );
+		fprintf( stderr, "Host API error = %s\n", hostErrorInfo->errorText );
+	}
+    Pa_Terminate();
 
-int main(void);
-int main(void)
-{
+    // DEBUG
+    fclose(wf_file);
+    fclose(og_file);
+
+    return err; 
 }

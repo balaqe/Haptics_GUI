@@ -130,6 +130,8 @@ public partial class MainWindowViewModel : ViewModelBase
         waveFormGen.LinearTrans(1, 0, fastSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
         waveFormGen.LinearTrans(1, (fastDuration-fastSmooth), fastDuration, 1, 0);
 
+        PlayWave(waveFormGen);
+
         AutoExport(waveFormGen, 5, "SineLinearFast.csv");
 
         // FunctionDictionary.Add("SineLinearFast", new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat)); 
@@ -167,6 +169,8 @@ public partial class MainWindowViewModel : ViewModelBase
         waveFormGen.LinearTrans(1, 0, slowSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
         waveFormGen.LinearTrans(1, (slowDuration-slowSmooth), slowDuration, 1, 0);
 
+        PlayWave(waveFormGen);
+
         AutoExport(waveFormGen, 5, "SineLinearSlow.csv");
 
         // FunctionDictionary.Add("SineLinearSlow", new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat)); 
@@ -198,6 +202,9 @@ public partial class MainWindowViewModel : ViewModelBase
         waveFormGen.Sine(100.0, fastDuration, 1, 0);
         waveFormGen.SigmoidTrans(1, 0, fastSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
         waveFormGen.SigmoidTrans(1, (fastDuration-fastSmooth), fastDuration, 1, 0);
+
+        PlayWave(waveFormGen);
+
         // FunctionDictionary.Add("SineSmoothFast", new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat)); 
         // FunctionDictionary["SineSmoothFast"].Play();
     }
@@ -225,8 +232,8 @@ public partial class MainWindowViewModel : ViewModelBase
         waveFormGen.Sine(100.0, slowDuration, 1, 0);
         waveFormGen.SigmoidTrans(1, 0, slowSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
         waveFormGen.SigmoidTrans(1, (slowDuration-slowSmooth), slowDuration, 1, 0);
-        // FunctionDictionary.Add("SineSmoothSlow", new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat)); 
-        // FunctionDictionary["SineSmoothSlow"].Play();
+
+        PlayWave(waveFormGen);
     }
     
     [RelayCommand]
@@ -252,8 +259,8 @@ public partial class MainWindowViewModel : ViewModelBase
         waveFormGen.Square(100.0, duration, 1, 0);
         waveFormGen.LinearTrans(5, 0, duration, squareAmp, squareAmp);
         waveFormGen.LinearTrans(1, 0, duration, squareAmp, squareAmp);
-        // FunctionDictionary.Add("SquareStep", new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat)); 
-        // FunctionDictionary["SquareStep"].Play();
+
+        PlayWave(waveFormGen);
     }
     
     [RelayCommand]
@@ -280,8 +287,8 @@ public partial class MainWindowViewModel : ViewModelBase
         waveFormGen.LinearTrans(1, (fastDuration-fastSmooth), fastDuration, 1, 0);
         waveFormGen.LinearTrans(5, 0, duration, squareAmp, squareAmp);
         waveFormGen.LinearTrans(1, 0, duration, squareAmp, squareAmp);
-        // FunctionDictionary.Add("SquareLinearFast", new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat)); 
-        // FunctionDictionary["SquareLinearFast"].Play();
+
+        PlayWave(waveFormGen);
     }
     
     [RelayCommand]
@@ -308,8 +315,8 @@ public partial class MainWindowViewModel : ViewModelBase
         waveFormGen.LinearTrans(1, (slowDuration-slowSmooth), slowDuration, 1, 0);
         waveFormGen.LinearTrans(5, 0, duration, squareAmp, squareAmp);
         waveFormGen.LinearTrans(1, 0, duration, squareAmp, squareAmp);
-        // FunctionDictionary.Add("SquareLinearSlow", new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat)); 
-        // FunctionDictionary["SquareLinearSlow"].Play();
+
+        PlayWave(waveFormGen);
     }
     
     [RelayCommand]
@@ -337,8 +344,8 @@ public partial class MainWindowViewModel : ViewModelBase
         waveFormGen.SigmoidTrans(1, (fastDuration-fastSmooth), fastDuration, 1, 0);
         waveFormGen.LinearTrans(5, 0, duration, squareAmp, squareAmp);
         waveFormGen.LinearTrans(1, 0, duration, squareAmp, squareAmp);
-        // FunctionDictionary.Add("SquareSmoothFast", new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat)); 
-        // FunctionDictionary["SquareSmoothFast"].Play();
+
+        PlayWave(waveFormGen);
     }
     
     [RelayCommand]
@@ -365,8 +372,8 @@ public partial class MainWindowViewModel : ViewModelBase
         waveFormGen.SigmoidTrans(1, (slowDuration-slowSmooth), slowDuration, 1, 0);
         waveFormGen.LinearTrans(5, 0, duration, squareAmp, squareAmp);
         waveFormGen.LinearTrans(1, 0, duration, squareAmp, squareAmp);
-        // FunctionDictionary.Add("SquareSmoothSlow", new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat)); 
-        // FunctionDictionary["SquareSmoothSlow"].Play();
+
+        PlayWave(waveFormGen);
     }
     
     [RelayCommand]
@@ -506,5 +513,38 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             fsNew.Write(buff, 0, buff.Length);
         } 
+    }
+
+    private void PlayWave(WaveformGen waveFormGen)
+    {
+        int bitDepthDivider = (int)waveFormGen.BitDepth / 8;
+        int sampleCount = waveFormGen.ByteStreams[5].Length / bitDepthDivider;
+        float[] samples = new float[sampleCount];
+
+        int normalMax;
+        switch (waveFormGen.BitDepth)
+        {
+            case 8:
+                normalMax = Byte.MaxValue/2;
+                break;
+            case 16:
+                normalMax = Int16.MaxValue;
+                break;
+            default: // 32 bit
+                normalMax = Int32.MaxValue;
+                break;
+        }
+
+        for (int i = 0; i < sampleCount; i++)
+        {
+            // Convert 2 bytes starting at index i*2 into a 16-bit signed integer.
+            short sample = BitConverter.ToInt16(waveFormGen.ByteStreams[5], i * bitDepthDivider);
+            
+            // Normalize the sample to a float value in the range [-1, 1].
+            // For 16-bit audio, the range is from -32768 to 32767.
+            samples[i] = sample / (float)normalMax;
+        }
+
+        play(samples, samples.Length);
     }
 }

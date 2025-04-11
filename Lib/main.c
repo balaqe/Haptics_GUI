@@ -1,69 +1,11 @@
-////
-////  main.c
-////  PA_test
-////
-////  Created by Balázs Szakál on 09/04/2025.
-////
-//
-//#include <stdio.h>
-//
-//int main(int argc, const char * argv[]) {
-//    // insert code here...
-//    printf("Hello, World!\n");
-//    return 0;
-//}
-/** @file paex_sine.c
-    @ingroup examples_src
-    @brief Play a sine wave for several seconds.
-    @author Ross Bencina <rossb@audiomulch.com>
-    @author Phil Burk <philburk@softsynth.com>
-*/
-/*
- * $Id$
- *
- * This program uses the PortAudio Portable Audio Library.
- * For more information see: http://www.portaudio.com/
- * Copyright (c) 1999-2000 Ross Bencina and Phil Burk
- *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files
- * (the "Software"), to deal in the Software without restriction,
- * including without limitation the rights to use, copy, modify, merge,
- * publish, distribute, sublicense, and/or sell copies of the Software,
- * and to permit persons to whom the Software is furnished to do so,
- * subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
- * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR
- * ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
- * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
- * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- */
-
-/*
- * The text above constitutes the entire PortAudio license; however,
- * the PortAudio community also makes the following non-binding requests:
- *
- * Any person wishing to distribute modifications to the Software is
- * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also
- * requested that these non-binding requests be included along with the
- * license above.
- */
 #include <stdio.h>
-// #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include "portaudio.h"
 
-#define NUM_SECONDS         (1)
 #define SAMPLE_RATE         (44100)
 #define FRAMES_PER_BUFFER   (1)
+#define DEBUG_CH (1)
 
 #ifndef M_PI
 #define M_PI  (3.14159265)
@@ -73,30 +15,35 @@
 
 
 /*******************************************************************/
-int play(float *waveform, int n) {
+int play(float *data_in, int len, int num_ch) { // waveform data, length of waveforms, number of channels
+    float waveforms[len][num_ch];
     PaStreamParameters outputParameters;
     PaStream *stream;
     PaError err;
-    float buffer[FRAMES_PER_BUFFER][2]; /* stereo output buffer */
-    float debug_buff[n];
-    float sine[TABLE_SIZE]; /* sine wavetable */
-    int left_phase = 0;
-    int right_phase = 0;
-    int left_inc = 1;
-    int right_inc = 3; /* higher pitch so we can distinguish left and right. */
+    float buffer[FRAMES_PER_BUFFER][num_ch]; // Specify number of channels
+    float debug_buff[len];
     int i, j, k;
     int bufferCount;
+    int sample_count;
 
     // DEBUG
     FILE *wf_file;
-    // wf_file = fopen("waveform_log.csv", "w+");
     wf_file = fopen("./Debug/input_wave_log.csv", "w+");
     if (wf_file == NULL) printf("Could not open waveform_log.csv");
     FILE *og_file;
-    // og_file = fopen("original_sine_log.csv", "w+");
     og_file = fopen("./Debug/played_wave_log.csv", "w+");
     if (wf_file == NULL) printf("Could not open original_sine_log.csv");
-    
+    // printf("len: %d    num_ch: %d\n", len, num_ch);
+    // ** DEBUG
+
+    sample_count = 0;
+    for (i=0; i<num_ch; i++) {
+        for (j=0; j<len; j++) {
+            waveforms[j][i] = data_in[sample_count];
+            sample_count++;
+        }
+    }
+
     err = Pa_Initialize();
     if( err != paNoError ) goto error;
 
@@ -105,7 +52,7 @@ int play(float *waveform, int n) {
       fprintf(stderr,"Error: No default output device.\n");
       goto error;
     }
-    outputParameters.channelCount = 2;       /* stereo output */
+    outputParameters.channelCount = num_ch;       // specify number of channels
     outputParameters.sampleFormat = paFloat32; /* 32 bit floating point output */
     outputParameters.suggestedLatency = 0.050; // Pa_GetDeviceInfo( outputParameters.device )->defaultLowOutputLatency;
     outputParameters.hostApiSpecificStreamInfo = NULL;
@@ -122,38 +69,40 @@ int play(float *waveform, int n) {
     if( err != paNoError ) goto error;
 
 
-    // printf( "Play 3 times, higher each time.\n" );
-    
     err = Pa_StartStream( stream );
     if( err != paNoError ) goto error;
 
-    int count = 0;
-    // float debug_buff[bufferCount*FRAMES_PER_BUFFER];
-    bufferCount = n / FRAMES_PER_BUFFER;
+    sample_count = 0;
+    bufferCount = len / FRAMES_PER_BUFFER;
 
-    for( i=0; i < bufferCount; i++ )
-    {
-        for( j=0; j < FRAMES_PER_BUFFER; j++ )
-        {
-            buffer[j][0] = waveform[count];
-            buffer[j][1] = waveform[count];
-            debug_buff[count] = buffer[j][0];
-            count++;
+    for( i=0; i < bufferCount; i++ ) {
+        for( j=0; j < FRAMES_PER_BUFFER; j++ ) {
+            for ( k=0; k<num_ch; k++ ) {
+                buffer[j][k] = waveforms[sample_count][k];
+            }
+            
+            // DEBUG
+            debug_buff[sample_count] = buffer[j][DEBUG_CH];
+            // ** DEBUG
+
+            sample_count++;
         }
 
         err = Pa_WriteStream( stream, buffer, FRAMES_PER_BUFFER );
         if( err != paNoError ) goto error;
-    }   
-    // DEBUG
-    for (int k=0; k<n; k++) {
-        fprintf(wf_file, "%d,%.2f\n", k, waveform[k]);
-    }
-    for (int k=0; k<count; k++) {
-        fprintf(og_file, "%d,%.2f\n", k, debug_buff[k]);
-    }
+    }  
+    Pa_Sleep(100);
 
+    // DEBUG
+    for (j=0; j<len; j++) {
+        fprintf(wf_file, "%d,%.2f\n", j, waveforms[j][DEBUG_CH]);
+    }
+    for (j=0; j<sample_count; j++) {
+        fprintf(og_file, "%d,%.2f\n", j, debug_buff[j]);
+    }
     fclose(wf_file);
     fclose(og_file);
+    // ** DEBUG
 
     err = Pa_StopStream( stream );
     if( err != paNoError ) goto error;
@@ -163,7 +112,6 @@ int play(float *waveform, int n) {
     if( err != paNoError ) goto error;
 
     Pa_Terminate();
-    printf("Test finished.\n");
     
     return err;
 
@@ -171,8 +119,7 @@ error:
     fprintf( stderr, "An error occured while using the portaudio stream\n" );
     fprintf( stderr, "Error number: %d\n", err );
     fprintf( stderr, "Error message: %s\n", Pa_GetErrorText( err ) );
-	if( err == paUnanticipatedHostError )
-	{
+	if( err == paUnanticipatedHostError ) {
 		const PaHostErrorInfo *hostErrorInfo = Pa_GetLastHostErrorInfo();
 		fprintf( stderr, "Host API error = #%ld, hostApiType = %d\n", hostErrorInfo->errorCode, hostErrorInfo->hostApiType );
 		fprintf( stderr, "Host API error = %s\n", hostErrorInfo->errorText );
@@ -182,6 +129,7 @@ error:
     // DEBUG
     fclose(wf_file);
     fclose(og_file);
+    // ** DEBUG
 
     return err; 
 }

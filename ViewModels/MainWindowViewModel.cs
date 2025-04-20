@@ -38,7 +38,7 @@ public partial class MainWindowViewModel : ViewModelBase
         slowSmooth = 0.25;
         squareAmp = 0.81;
         frequency = 100;
-        channel1 = 5;
+        channel1 = 0;
         channel2 = 1;
  
     }

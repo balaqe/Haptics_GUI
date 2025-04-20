@@ -1,5 +1,5 @@
-PA_INC = /opt/homebrew/Cellar/portaudio/19.7.0/include
-PA_LIB = /opt/homebrew/Cellar/portaudio/19.7.0/lib
+PA_INC = "C:\Users\balage\Downloads\pa_stable_v190700_20210406\portaudio\include"
+PA_LIB = "C:\Users\balage\Downloads\pa_stable_v190700_20210406\portaudio\lib\.libs"
 
 default: all
 

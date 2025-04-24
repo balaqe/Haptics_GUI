@@ -15,6 +15,170 @@
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-    <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+<StackPanel>
+    <StackPanel HorizontalAlignment="Center">
+        <TextBox Name="OpenFileTextBox" Text="{Binding FilePath}"></TextBox>
+        <Button Name="OpenFileButton" Content="Open file" HorizontalAlignment="Stretch"></Button> 
+        <Button Name="PlayFileButton" Content="Play file" Command="{Binding PlayFile}" HorizontalAlignment="Stretch"></Button>
+        <Button Name="StopFileButton" Content="Stop playing file" Command="{Binding StopFile}" HorizontalAlignment="Stretch"></Button>
+    </StackPanel>
+    
+    <StackPanel>
+        <Border Margin="5" BorderBrush="Black" BorderThickness="1" CornerRadius="10">
+            <StackPanel>
+                <TextBlock Text="Sine waves" FontWeight="Bold" Margin="5"></TextBlock>
+                <Grid ColumnDefinitions="*,*,*,*,*" RowDefinitions="*" Margin="5">
+                    <Border Grid.Column="0" Grid.Row="0" Margin="5">
+                        <StackPanel>
+                            <TextBlock Text="1. Step" Margin="0, 0, 0, 5"></TextBlock>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="Play" FontSize="11" Height="28" Width="45" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                        Command="{Binding SineStepPlay}"></Button>
+                                <Button Content="Stop" FontSize="11" Height="28" Width="45" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                        Command="{Binding SineStepStop}"></Button>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="1" Grid.Row="0" Margin="5">
+                        <StackPanel>
+                            <TextBlock Text="2. Linear Fast" Margin="0, 0, 0, 5"></TextBlock>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="Play" FontSize="11" Height="28" Width="45" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                        Command="{Binding SineLinearFastPlay}"></Button>
+                                <Button Content="Stop" FontSize="11" Height="28" Width="45" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                        Command="{Binding SineLinearFastStop}"></Button>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="2" Grid.Row="0" Margin="5">
+                        <StackPanel>
+                            <TextBlock Text="3. Linear Slow" Margin="0, 0, 0, 5"></TextBlock>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="Play" FontSize="11" Height="28" Width="45" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                        Command="{Binding SineLinearSlowPlay}"></Button>
+                                <Button Content="Stop" FontSize="11" Height="28" Width="45" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                        Command="{Binding SineLinearSlowStop}"></Button>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="3" Grid.Row="0" Margin="5">
+                        <StackPanel>
+                            <TextBlock Text="4. Smooth Fast" Margin="0, 0, 0, 5"></TextBlock>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="Play" FontSize="11" Height="28" Width="45" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                        Command="{Binding SineSmoothFastPlay}"></Button>
+                                <Button Content="Stop" FontSize="11" Height="28" Width="45" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                        Command="{Binding SineSmoothFastStop}"></Button>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="4" Grid.Row="0" Margin="5">
+                        <StackPanel>
+                            <TextBlock Text="5. Smooth Slow" Margin="0, 0, 0, 5"></TextBlock>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="Play" FontSize="11" Height="28" Width="45" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                        Command="{Binding SineSmoothSlowPlay}"></Button>
+                                <Button Content="Stop" FontSize="11" Height="28" Width="45" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                        Command="{Binding SineSmoothSlowStop}"></Button>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </StackPanel>
+        </Border>
+        
+        <Border Margin="5" BorderBrush="Black" BorderThickness="1" CornerRadius="10">
+            <StackPanel>
+                <TextBlock Text="Square waves" FontWeight="Bold" Margin="5"></TextBlock>
+                <Grid ColumnDefinitions="*,*,*,*,*" RowDefinitions="*" Margin="5">
+                    <Border Grid.Column="0" Grid.Row="0" Margin="5">
+                        <StackPanel>
+                            <TextBlock Text="6. Step" Margin="0, 0, 0, 5"></TextBlock>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="Play" FontSize="11" Height="28" Width="45" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                        Command="{Binding SquareStepPlay}"></Button>
+                                <Button Content="Stop" FontSize="11" Height="28" Width="45" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                        Command="{Binding SquareStepStop}"></Button>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="1" Grid.Row="0" Margin="5">
+                        <StackPanel>
+                            <TextBlock Text="7. Linear Fast" Margin="0, 0, 0, 5"></TextBlock>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="Play" FontSize="11" Height="28" Width="45" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                        Command="{Binding SquareLinearFastPlay}"></Button>
+                                <Button Content="Stop" FontSize="11" Height="28" Width="45" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                        Command="{Binding SquareLinearFastStop}"></Button>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="2" Grid.Row="0" Margin="5">
+                        <StackPanel>
+                            <TextBlock Text="8. Linear Slow" Margin="0, 0, 0, 5"></TextBlock>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="Play" FontSize="11" Height="28" Width="45" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                        Command="{Binding SquareLinearSlowPlay}"></Button>
+                                <Button Content="Stop" FontSize="11" Height="28" Width="45" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                        Command="{Binding SquareLinearSlowStop}"></Button>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="3" Grid.Row="0" Margin="5">
+                        <StackPanel>
+                            <TextBlock Text="9. Smooth Fast" Margin="0, 0, 0, 5"></TextBlock>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="Play" FontSize="11" Height="28" Width="45" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                        Command="{Binding SquareSmoothFastPlay}"></Button>
+                                <Button Content="Stop" FontSize="11" Height="28" Width="45" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                        Command="{Binding SquareSmoothFastStop}"></Button>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="4" Grid.Row="0" Margin="5">
+                        <StackPanel>
+                            <TextBlock Text="10. Smooth Slow" Margin="0, 0, 0, 5"></TextBlock>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="Play" FontSize="11" Height="28" Width="45" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                        Command="{Binding SquareSmoothSlowPlay}"></Button>
+                                <Button Content="Stop" FontSize="11" Height="28" Width="45" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                        Command="{Binding SquareSmoothSlowStop}"></Button>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </StackPanel>
+        </Border>
+        <Border Margin="5" BorderBrush="Black" BorderThickness="1" CornerRadius="10">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <StackPanel>
+                    <TextBlock Text="Duration" Margin="5"/>
+                    <TextBox Margin="10" Text="{Binding Duration}"/>
+                </StackPanel>
+                <StackPanel>
+                    <TextBlock Text="FastDuration" Margin="5"/>
+                    <TextBox Margin="10" Text="{Binding FastDuration}"/>
+                </StackPanel>
+                <StackPanel>
+                    <TextBlock Text="SlowDuration" Margin="5"/>
+                    <TextBox Margin="10" Text="{Binding SlowDuration}"/>
+                </StackPanel>
+                <StackPanel>
+                    <TextBlock Text="FastSmooth" Margin="5"/>
+                    <TextBox Margin="10" Text="{Binding FastSmooth}"/>
+                </StackPanel>
+                <StackPanel>
+                    <TextBlock Text="SlowSmooth" Margin="5"/>
+                    <TextBox Margin="10" Text="{Binding SlowSmooth}"/>
+                </StackPanel>
+                <StackPanel>
+                    <TextBlock Text="Square Amplitude" Margin="5"/>
+                    <TextBox Margin="10" Text="{Binding SquareAmp}"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+        <TextBlock HorizontalAlignment="Center" Text="Order 1 5 9 10 3 4 2 7 6 8"/>
+    </StackPanel>
 
+    </StackPanel>
 </Window>

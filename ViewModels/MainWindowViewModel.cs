@@ -38,7 +38,7 @@ public partial class MainWindowViewModel : ViewModelBase
         slowSmooth = 0.25;
         squareAmp = 0.81;
         frequency = 100;
-        channel1 = 5;
+        channel1 = 0;
         channel2 = 1;
  
     }
@@ -52,7 +52,9 @@ public partial class MainWindowViewModel : ViewModelBase
 
         var waveFormGen = new WaveformGen();
         waveFormGen.Sine(frequency, duration, channel1, 0);
-        waveFormGen.Sine(frequency, duration, channel2, 0);
+        waveFormGen.Sine(frequency, duration, channel2, 0.3);
+        waveFormGen.Sine(frequency, duration, channel1, 0.6);
+        waveFormGen.Sine(frequency, duration, channel2, 0.9);
 
         PlayWave(waveFormGen);
     }

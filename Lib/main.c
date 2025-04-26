@@ -26,6 +26,7 @@ int play(float *data_in, int len, int num_ch) { // waveform data, length of wave
     int bufferCount;
     int sample_count;
 
+
     // DEBUG
     FILE *wf_file;
     wf_file = fopen("./Debug/input_wave_log.csv", "w+");
@@ -44,6 +45,7 @@ int play(float *data_in, int len, int num_ch) { // waveform data, length of wave
         }
     }
 
+
     err = Pa_Initialize();
     if( err != paNoError ) goto error;
 
@@ -56,6 +58,7 @@ int play(float *data_in, int len, int num_ch) { // waveform data, length of wave
     outputParameters.sampleFormat = paFloat32; /* 32 bit floating point output */
     outputParameters.suggestedLatency = 0.050; // Pa_GetDeviceInfo( outputParameters.device )->defaultLowOutputLatency;
     outputParameters.hostApiSpecificStreamInfo = NULL;
+
 
     err = Pa_OpenStream(
               &stream,
@@ -91,7 +94,7 @@ int play(float *data_in, int len, int num_ch) { // waveform data, length of wave
         err = Pa_WriteStream( stream, buffer, FRAMES_PER_BUFFER );
         if( err != paNoError ) goto error;
     }  
-    Pa_Sleep(100);
+    Pa_Sleep(300);
 
     // DEBUG
     for (j=0; j<len; j++) {

@@ -7,7 +7,7 @@ public abstract class Function
     public double freq;
     public double dur;
     public int channel;
-    public int start;
+    // public int start;
     public int samplingRate;
     public int bitDepth;
     public byte[] waveform;

@@ -32,7 +32,7 @@ public class WaveformGen
         ByteStreams = new List<byte[]>();
     }
 
-    public void Sine (double freq, double dur, int channelNo, int start)
+    public void Sine (double freq, double dur, int channelNo, double start)
     {
         spawnChannel(channelNo, dur, start);
         Function sine = new Sine(freq, dur, channelNo, SamplingRate, BitDepth);
@@ -43,7 +43,7 @@ public class WaveformGen
         Array.Copy(sine.waveform, 0, ByteStreams[channelNo], offset, sine.waveform.Length);
     }
 
-    public void Square (double freq, double dur, int channelNo, int start)
+    public void Square (double freq, double dur, int channelNo, double start)
     {
         spawnChannel(channelNo, dur, start);
         Function square = new Square(freq, dur, channelNo, SamplingRate, BitDepth);
@@ -70,7 +70,7 @@ public class WaveformGen
         ByteStreams[channelNo] = sigmoid.resultData;
     }
 
-    private void spawnChannel (int channelNo, double dur, int start)
+    private void spawnChannel (int channelNo, double dur, double start)
     {
         int noOfSamples = (int)((double)SamplingRate * (dur + start));
         int  byteLength = noOfSamples * BitDepth / 8;

@@ -68,6 +68,13 @@ public partial class MainWindowViewModel : ViewModelBase
         squareAmp = 0.81;
         
         FunctionDictionary = new Dictionary<string, ByteStream>();
+
+
+        var temp = new FreqSweepWaveformGen(44100, 16);
+        temp.Sine(100.0, 200.0, 0.5, 0, 0);
+        //temp.Sine(200.0, 300.0, 0.5, 0, 0.5);
+        var temp2 = new ByteStream(temp.ByteStreams, temp.WaveFormat); 
+        temp2.Play();
     }
     
     

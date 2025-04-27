@@ -44,7 +44,7 @@ public class ByteStream
                 new WaveFormat(WaveFormat.SampleRate, 1)));
         }
         WaveProvider = new MultiplexingWaveProvider(Waves, WaveFormat.Channels);
-        WasapiOut = new WasapiOut(AudioClientShareMode.Exclusive, true, 500);
+        WasapiOut = new WasapiOut(AudioClientShareMode.Exclusive, true, 1000);
         WasapiOut.Init(WaveProvider);
     }
 

@@ -72,6 +72,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         var temp = new FreqSweepWaveformGen(44100, 8);
         temp.Sine(100.0, 200.0, 0.5, 0, 0);
+        temp.LinearTrans(0, 0, 0.5, 0.5, 1);
         temp.Sine(200.0, 400.0, 0.5, 0, 0.5);
         var temp2 = new ByteStream(temp.ByteStreams, temp.WaveFormat); 
         //temp2.Play();

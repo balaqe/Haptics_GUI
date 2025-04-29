@@ -11,10 +11,8 @@ public class FreqSweepSine : FreqSweepFunction
     public override double Func(int numberOfSamples, int i)
     { 
         // uncomplete
-        var arg = ((startFreq / samplingRate) + (((endFreq - startFreq) / samplingRate) / numberOfSamples) / 2 * i) 
-                  * 2 * Math.PI * i 
-                  + 2 * Math.PI * startPhase;
-        endPhase = arg / 2 * Math.PI - ((startFreq / samplingRate) + (((endFreq - startFreq) / samplingRate) / numberOfSamples) * i) * i; // Modulo this to not have BIG number
-        return Math.Sin(arg); // Formula for linear chirp
+        var phase = startPhase + 2*Math.PI * i * (((endFreq - startFreq) * i) / (2 * samplingRate * numberOfSamples) + startFreq / samplingRate);
+        endPhase = phase % (2 * Math.PI);
+        return Math.Sin(phase); // Formula for linear chirp
     }
 }

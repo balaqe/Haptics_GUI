@@ -70,11 +70,11 @@ public partial class MainWindowViewModel : ViewModelBase
         FunctionDictionary = new Dictionary<string, ByteStream>();
 
 
-        var temp = new FreqSweepWaveformGen(44100, 16);
+        var temp = new FreqSweepWaveformGen(44100, 8);
         temp.Sine(100.0, 200.0, 0.5, 0, 0);
-        //temp.Sine(200.0, 300.0, 0.5, 0, 0.5);
+        temp.Sine(200.0, 400.0, 0.5, 0, 0.5);
         var temp2 = new ByteStream(temp.ByteStreams, temp.WaveFormat); 
-        temp2.Play();
+        //temp2.Play();
     }
     
     

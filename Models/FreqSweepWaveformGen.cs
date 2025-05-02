@@ -14,6 +14,11 @@ public class FreqSweepWaveformGen
     public byte BitDepth;
     public List<byte[]> ByteStreams;
 
+    public List<List<PhaseOffset>> PhaseOffsets;
+    
+    public WaveFormat WaveFormat;
+    private double longestTrack;
+    
     public class PhaseOffset
     {
         public double Phase;
@@ -31,10 +36,6 @@ public class FreqSweepWaveformGen
             Timestamp = timestamp;
         }
     }
-    public List<List<PhaseOffset>> PhaseOffsets;
-    
-    public WaveFormat WaveFormat;
-    private double longestTrack;
 
     public FreqSweepWaveformGen() // Default constructor
     {
@@ -118,6 +119,23 @@ public class FreqSweepWaveformGen
 
         var offset = (int)((double)SamplingRate * start * BitDepth / 8);
         Array.Copy(sine.Waveform, 0, ByteStreams[channelNo], offset, sine.Waveform.Length);
+    }
+    
+    
+    public void LinearTrans(int channelNo, double startTime, double endTime, double startVal, double endVal)
+    {
+        Transition linear = new Linear(ByteStreams[channelNo], startTime, endTime, startVal, endVal, BitDepth, SamplingRate);
+        linear.Generator();
+        // Array.Copy(linear.resultData, 0, ByteStreams[channelNo], 0, linear.resultData.Length);
+        ByteStreams[channelNo] = linear.resultData;
+    }
+    
+    public void SigmoidTrans(int channelNo, double startTime, double endTime, double startVal, double endVal)
+    {
+        Transition sigmoid = new Sigmoid(ByteStreams[channelNo], startTime, endTime, startVal, endVal, BitDepth, SamplingRate);
+        sigmoid.Generator();
+        // Array.Copy(linear.resultData, 0, ByteStreams[channelNo], 0, linear.resultData.Length);
+        ByteStreams[channelNo] = sigmoid.resultData;
     }
 
 }

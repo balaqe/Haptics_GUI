@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -12,19 +13,50 @@ namespace Haptics_GUI.ViewModels;
 public partial class MainWindowViewModel : ViewModelBase
 {
     [ObservableProperty] public string filePath;
-    [ObservableProperty] public double duration;
-    [ObservableProperty] public double fastDuration;
-    [ObservableProperty] public double slowDuration;
-    [ObservableProperty] public double fastSmooth;
-    [ObservableProperty] public double slowSmooth;
-    [ObservableProperty] public double squareAmp;
+    [ObservableProperty] public int channel1;
+    [ObservableProperty] public int channel2;
+
+    [ObservableProperty] public int pulseCount;
+    [ObservableProperty] public bool count1;
+    [ObservableProperty] public bool count2;
+    [ObservableProperty] public bool count3;
+    [ObservableProperty] public bool customCount;
+
+    [ObservableProperty] public int frequency;
+    [ObservableProperty] public bool freq1;
+    [ObservableProperty] public bool freq2;
+    [ObservableProperty] public bool freq3;
+    [ObservableProperty] public bool customFreq;
+
+    [ObservableProperty] public double pulseDelay;
+    [ObservableProperty] public bool pulseDelay1;
+    [ObservableProperty] public bool pulseDelay2;
+    [ObservableProperty] public bool pulseDelay3;
+
+    [ObservableProperty] public bool sweep1;
+    [ObservableProperty] public bool sweep2;
+    [ObservableProperty] public bool sweep3;
+    [ObservableProperty] public bool sweep4;
+
+    [ObservableProperty] public bool phase1;
+    [ObservableProperty] public bool phase2;
+    [ObservableProperty] public bool phase3;
+    [ObservableProperty] public bool phase4;
+    [ObservableProperty] public bool phase5;
+    [ObservableProperty] public double leftPhaseOffset;
+    [ObservableProperty] public double rightPhaseOffset;
+
 
     private AudioFileReader audioFile;
     private WasapiOut audioOut;
 
     private ByteStream? byteStream;
     
-    private IDictionary<string, ByteStream> FunctionDictionary;
+    // private IDictionary<string, ByteStream> FunctionDictionary;
+    private ByteStream streamer;
+
+    private double refreshingDur;
+    private double alarmingDur;
     
 
     [RelayCommand]
@@ -60,21 +92,25 @@ public partial class MainWindowViewModel : ViewModelBase
     public MainWindowViewModel()
     {
         filePath = string.Empty;
-        duration = 0.2;
-        fastDuration = 0.2;
-        slowDuration = 0.5;
-        fastSmooth = 0.1;
-        slowSmooth = 0.25;
-        squareAmp = 0.81;
+        frequency = 100;
+        alarmingDur = 0.32; // Results in full periods (original: 0.2)
+        refreshingDur = 0.4; // Results in full periods (original: 0.5)
+        count1 = true;
+        count2 = false;
+        count3 = false;
+        channel1 = 1;
+        channel2 = 0;
+        pulseDelay = 0.2;
+        // duration = 0.2;
+        // fastDuration = 0.2;
+        // slowDuration = 0.5;
+        // fastSmooth = 0.1;
+        // slowSmooth = 0.25;
+        // squareAmp = 0.81;
         
-        FunctionDictionary = new Dictionary<string, ByteStream>();
+        // FunctionDictionary = new Dictionary<string, ByteStream>();
 
 
-        var temp = new FreqSweepWaveformGen(44100, 16);
-        temp.Sine(100.0, 200.0, 0.5, 0, 0);
-        //temp.Sine(200.0, 300.0, 0.5, 0, 0.5);
-        var temp2 = new ByteStream(temp.ByteStreams, temp.WaveFormat); 
-        temp2.Play();
     }
     
     
@@ -82,276 +118,248 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     public void SineStepPlay()
     {
+        // streamer.Dispose();
+        // FunctionDictionary.Add("SweepingSineStep", new ByteStream(waveFormGen.ByteStreams, waveFormGen.WaveFormat)); 
+        // FunctionDictionary["SweepingSineStep"].Play();
+    }
+
+    [RelayCommand]
+    public void FindAlarmCount()
+    {
+        if (!customFreq)
+        {
+            if (count1) // 1
+            {
+                pulseCount = 1;
+            }
+            else if (count2) // 3
+            {
+                pulseCount = 3;
+            }
+            else // 5
+            {
+                pulseCount = 5;
+            }
+        }
+
+        // Console.WriteLine("Pulse count: " + pulseCount);
+
         Reset();
 
-        var waveFormGen = new WaveformGen();
-        waveFormGen.Sine(100.0, duration, 5, 0);
-        waveFormGen.Sine(100.0, duration, 1, 0);
-        
-        FunctionDictionary.Add("SineStep", new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat)); 
-        FunctionDictionary["SineStep"].Play();
+        var waveFormGen = new FreqSweepWaveformGen(44100, 16);
+
+        frequency = 100;
+
+        for (int i=0; i<pulseCount; i++)
+        {
+            waveFormGen.Sine(frequency, frequency, alarmingDur, channel1, (alarmingDur + pulseDelay)*i);
+            waveFormGen.Sine(frequency, frequency, alarmingDur, channel2, (alarmingDur + pulseDelay)*i);
+        }
+
+        streamer = new ByteStream(waveFormGen.ByteStreams, waveFormGen.WaveFormat); 
+        streamer.Play();
     }
 
     [RelayCommand]
-    public void SineStepStop()
+    public void FindFreq()
     {
-        if (FunctionDictionary.ContainsKey("SineStep"))
+        if (!customFreq)
         {
-            FunctionDictionary["SineStep"].Dispose();
+            if (freq1) // 100 Hz
+            {
+                frequency = 100;
+            }
+            else if (freq2) // 125 Hz
+            {
+                frequency = 125;
+            }
+            else // freq3 // 75 Hz
+            {
+                frequency = 75;
+            }
         }
-    }
-    
-    
-    [RelayCommand]
-    public void SineLinearFastPlay()
-    {
+
+        // Console.WriteLine("Freq: " + frequency);
+
         Reset();
 
-        var waveFormGen = new WaveformGen();
-        waveFormGen.Sine(100.0, fastDuration, 5, 0);
-        waveFormGen.LinearTrans(5, 0, fastSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
-        waveFormGen.LinearTrans(5, (fastDuration-fastSmooth), fastDuration, 1, 0);
-        waveFormGen.Sine(100.0, fastDuration, 1, 0);
-        waveFormGen.LinearTrans(1, 0, fastSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
-        waveFormGen.LinearTrans(1, (fastDuration-fastSmooth), fastDuration, 1, 0);
-        FunctionDictionary.Add("SineLinearFast", new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat)); 
-        FunctionDictionary["SineLinearFast"].Play();
-    }
-    
-    [RelayCommand]
-    public void SineLinearFastStop()
-    {
-        if (FunctionDictionary.ContainsKey("SineLinearFast"))
+        var waveFormGen = new FreqSweepWaveformGen(44100, 16);
+        for (int i=0; i<pulseCount; i++)
         {
-            FunctionDictionary["SineLinearFast"].Dispose();
+            waveFormGen.Sine(frequency, frequency, alarmingDur, channel1, (alarmingDur + pulseDelay)*i);
+            waveFormGen.Sine(frequency, frequency, alarmingDur, channel2, (alarmingDur + pulseDelay)*i);
         }
+        streamer = new ByteStream(waveFormGen.ByteStreams, waveFormGen.WaveFormat); 
+        streamer.Play();
     }
-    
-    
+
     [RelayCommand]
-    public void SineLinearSlowPlay()
+    public void FindPulseDelay()
     {
+        if (pulseDelay1)
+        {
+            pulseDelay = 0.2;
+        }
+        else if (pulseDelay2)
+        {
+            pulseDelay = 0.3;
+        }
+        else
+        {
+            pulseDelay = 0.1;
+        }
+
+        // Console.WriteLine("Freq: " + frequency);
+
         Reset();
 
-        var waveFormGen = new WaveformGen();
-        waveFormGen.Sine(100.0, slowDuration, 5, 0);
-        waveFormGen.LinearTrans(5, 0, slowSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
-        waveFormGen.LinearTrans(5, (slowDuration-slowSmooth), slowDuration, 1, 0);
-        waveFormGen.Sine(100.0, slowDuration, 1, 0);
-        waveFormGen.LinearTrans(1, 0, slowSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
-        waveFormGen.LinearTrans(1, (slowDuration-slowSmooth), slowDuration, 1, 0);
-        FunctionDictionary.Add("SineLinearSlow", new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat)); 
-        FunctionDictionary["SineLinearSlow"].Play();
-    }
-
-    [RelayCommand]
-    public void SineLinearSlowStop()
-    {
-        if (FunctionDictionary.ContainsKey("SineLinearSlow"))
+        var waveFormGen = new FreqSweepWaveformGen(44100, 16);
+        for (int i=0; i<pulseCount; i++)
         {
-            FunctionDictionary["SineLinearSlow"].Dispose();
+            waveFormGen.Sine(frequency, frequency, alarmingDur, channel1, (alarmingDur + pulseDelay)*i);
+            waveFormGen.Sine(frequency, frequency, alarmingDur, channel2, (alarmingDur + pulseDelay)*i);
         }
-        
+        streamer = new ByteStream(waveFormGen.ByteStreams, waveFormGen.WaveFormat); 
+        streamer.Play();
     }
     
     [RelayCommand]
-    public void SineSmoothFastPlay()
+    public void FindSweep()
     {
+
         Reset();
 
-        var waveFormGen = new WaveformGen();
-        waveFormGen.Sine(100.0, fastDuration, 5, 0);
-        waveFormGen.SigmoidTrans(5, 0, fastSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
-        waveFormGen.SigmoidTrans(5, (fastDuration-fastSmooth), fastDuration, 1, 0);
-        waveFormGen.Sine(100.0, fastDuration, 1, 0);
-        waveFormGen.SigmoidTrans(1, 0, fastSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
-        waveFormGen.SigmoidTrans(1, (fastDuration-fastSmooth), fastDuration, 1, 0);
-        FunctionDictionary.Add("SineSmoothFast", new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat)); 
-        FunctionDictionary["SineSmoothFast"].Play();
-    }
-    
-    [RelayCommand]
-    public void SineSmoothFastStop()
-    {
-        if (FunctionDictionary.ContainsKey("SineSmoothFast"))
+        var waveFormGen = new FreqSweepWaveformGen(44100, 16);
+        for (int i=0; i<pulseCount; i++)
         {
-            FunctionDictionary["SineSmoothFast"].Dispose();
+            if (sweep1)
+            {
+                waveFormGen.Sine(frequency-25, frequency, alarmingDur, channel1, (alarmingDur + pulseDelay)*i);
+                // waveFormGen.Sine(frequency, frequency, alarmingDur/2, channel1, (alarmingDur + pulseDelay)*i + alarmingDur/2);
+
+                waveFormGen.Sine(frequency-25, frequency, alarmingDur, channel2, (alarmingDur + pulseDelay)*i);
+                // waveFormGen.Sine(frequency, frequency, alarmingDur/2, channel2, (alarmingDur + pulseDelay)*i + alarmingDur/2);
+            }
+            else if (sweep2)
+            {
+                waveFormGen.Sine(frequency+25, frequency, alarmingDur, channel1, (alarmingDur + pulseDelay)*i);
+                // waveFormGen.Sine(frequency, frequency, alarmingDur/2, channel1, (alarmingDur + pulseDelay)*i + alarmingDur/2);
+
+                waveFormGen.Sine(frequency+25, frequency, alarmingDur, channel2, (alarmingDur + pulseDelay)*i);
+                // waveFormGen.Sine(frequency, frequency, alarmingDur/2, channel2, (alarmingDur + pulseDelay)*i + alarmingDur/2);
+            }
+            else if (sweep3)
+            {
+                // waveFormGen.Sine(frequency, frequency-25, alarmingDur/2, channel1, (alarmingDur + pulseDelay)*i);
+                // waveFormGen.Sine(frequency, frequency, alarmingDur/2, channel1, (alarmingDur + pulseDelay)*i + alarmingDur/2);
+
+                // waveFormGen.Sine(frequency, frequency-25, alarmingDur/2, channel2, (alarmingDur + pulseDelay)*i);
+                // waveFormGen.Sine(frequency, frequency, alarmingDur/2, channel2, (alarmingDur + pulseDelay)*i + alarmingDur/2);
+            }
+            else
+            {
+                // waveFormGen.Sine(frequency, frequency+25, alarmingDur/2, channel1, (alarmingDur + pulseDelay)*i);
+                // waveFormGen.Sine(frequency, frequency, alarmingDur/2, channel1, (alarmingDur + pulseDelay)*i + alarmingDur/2);
+
+                // waveFormGen.Sine(frequency, frequency+25, alarmingDur/2, channel2, (alarmingDur + pulseDelay)*i);
+                // waveFormGen.Sine(frequency, frequency, alarmingDur/2, channel2, (alarmingDur + pulseDelay)*i + alarmingDur/2);
+            }
         }
+        streamer = new ByteStream(waveFormGen.ByteStreams, waveFormGen.WaveFormat); 
+        streamer.Play();
     }
-    
-    
+
     [RelayCommand]
-    public void SineSmoothSlowPlay()
+    public void FindPhase()
     {
+        double[] possibleOffsets = new double[3];
+        double[] rightPhaseOffsets = new double[pulseCount];
+        double[] leftPhaseOffsets = new double[pulseCount];
+
+        possibleOffsets[0] = 0;
+        possibleOffsets[1] = (alarmingDur+pulseDelay)/4;
+        possibleOffsets[2] = (alarmingDur+pulseDelay)/2;
+
+        // We don't need a case for phase 1 as it is the default sync case
+        if (phase2)
+        {
+            for (int i=0; i<pulseCount; i++)
+            {
+                rightPhaseOffsets[i] = (alarmingDur+pulseDelay)/4;
+                leftPhaseOffsets[i] = 0;
+            }
+        }
+        else if (phase3)
+        {
+            for (int i=0; i<pulseCount; i++)
+            {
+                leftPhaseOffsets[i] = (alarmingDur+pulseDelay)/4;
+                rightPhaseOffsets[i] = 0;
+            }
+        }
+        else if (phase4)
+        {
+            for (int i=0; i<pulseCount; i++)
+            {
+                rightPhaseOffsets[i] = (alarmingDur+pulseDelay)/2;
+                leftPhaseOffsets[i] = 0;
+            }
+        }
+        else
+        {
+            Random rnd = new Random();
+
+            for (int i=0; i<pulseCount; i++)
+            {
+                rightPhaseOffsets[i] = possibleOffsets[rnd.Next(0, 2)];
+                leftPhaseOffsets[i] = possibleOffsets[rnd.Next(0, 2)];
+            }
+        }
+
         Reset();
 
-        var waveFormGen = new WaveformGen();
-        waveFormGen.Sine(100.0, slowDuration, 5, 0);
-        waveFormGen.SigmoidTrans(5, 0, slowSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
-        waveFormGen.SigmoidTrans(5, (slowDuration-slowSmooth), slowDuration, 1, 0);
-        waveFormGen.Sine(100.0, slowDuration, 1, 0);
-        waveFormGen.SigmoidTrans(1, 0, slowSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
-        waveFormGen.SigmoidTrans(1, (slowDuration-slowSmooth), slowDuration, 1, 0);
-        FunctionDictionary.Add("SineSmoothSlow", new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat)); 
-        FunctionDictionary["SineSmoothSlow"].Play();
-    }
-    
-    [RelayCommand]
-    public void SineSmoothSlowStop()
-    {
-        if (FunctionDictionary.ContainsKey("SineSmoothSlow"))
+        var waveFormGen = new FreqSweepWaveformGen(44100, 16);
+        for (int i=0; i<pulseCount; i++)
         {
-            FunctionDictionary["SineSmoothSlow"].Dispose();
-        }
-    }
-    
-    
-    
-    
-    
-    [RelayCommand]
-    public void SquareStepPlay()
-    {
-        Reset();
+            if (sweep1)
+            {
+                waveFormGen.Sine(frequency-25, frequency, alarmingDur, channel1, (alarmingDur + pulseDelay + rightPhaseOffsets[i])*i);
+                // waveFormGen.Sine(frequency, frequency, alarmingDur/2, channel1, (alarmingDur + pulseDelay)*i + alarmingDur/2);
 
-        var waveFormGen = new WaveformGen();
-        waveFormGen.Square(100.0, duration, 5, 0);
-        waveFormGen.Square(100.0, duration, 1, 0);
-        waveFormGen.LinearTrans(5, 0, duration, squareAmp, squareAmp);
-        waveFormGen.LinearTrans(1, 0, duration, squareAmp, squareAmp);
-        FunctionDictionary.Add("SquareStep", new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat)); 
-        FunctionDictionary["SquareStep"].Play();
-    }
-    
-    [RelayCommand]
-    public void SquareStepStop()
-    {
-        if (FunctionDictionary.ContainsKey("SquareStep"))
-        {
-            FunctionDictionary["SquareStep"].Dispose();
-        }
-    }
-    
-    
-    [RelayCommand]
-    public void SquareLinearFastPlay()
-    {
-        Reset();
+                waveFormGen.Sine(frequency-25, frequency, alarmingDur, channel2, (alarmingDur + pulseDelay + leftPhaseOffsets[i])*i);
+                // waveFormGen.Sine(frequency, frequency, alarmingDur/2, channel2, (alarmingDur + pulseDelay)*i + alarmingDur/2);
+            }
+            else if (sweep2)
+            {
+                waveFormGen.Sine(frequency+25, frequency, alarmingDur, channel1, (alarmingDur + pulseDelay + rightPhaseOffsets[i])*i);
+                // waveFormGen.Sine(frequency, frequency, alarmingDur/2, channel1, (alarmingDur + pulseDelay)*i + alarmingDur/2);
 
-        var waveFormGen = new WaveformGen();
-        waveFormGen.Square(100.0, fastDuration, 5, 0);
-        waveFormGen.LinearTrans(5, 0, fastSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
-        waveFormGen.LinearTrans(5, (fastDuration-fastSmooth), fastDuration, 1, 0);
-        waveFormGen.Square(100.0, fastDuration, 1, 0);
-        waveFormGen.LinearTrans(1, 0, fastSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
-        waveFormGen.LinearTrans(1, (fastDuration-fastSmooth), fastDuration, 1, 0);
-        waveFormGen.LinearTrans(5, 0, duration, squareAmp, squareAmp);
-        waveFormGen.LinearTrans(1, 0, duration, squareAmp, squareAmp);
-        FunctionDictionary.Add("SquareLinearFast", new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat)); 
-        FunctionDictionary["SquareLinearFast"].Play();
-    }
-    
-    [RelayCommand]
-    public void SquareLinearFastStop()
-    {
-        if (FunctionDictionary.ContainsKey("SquareLinearFast"))
-        {
-            FunctionDictionary["SquareLinearFast"].Dispose();
-        }
-    }
-    
-    
-    [RelayCommand]
-    public void SquareLinearSlowPlay()
-    {
-        Reset();
+                waveFormGen.Sine(frequency+25, frequency, alarmingDur, channel2, (alarmingDur + pulseDelay + leftPhaseOffsets[i])*i);
+                // waveFormGen.Sine(frequency, frequency, alarmingDur/2, channel2, (alarmingDur + pulseDelay)*i + alarmingDur/2);
+            }
+            else if (sweep3)
+            {
+                // waveFormGen.Sine(frequency, frequency, alarmingDur/2, channel1, (alarmingDur + pulseDelay)*i);
+                // waveFormGen.Sine(frequency, frequency-25, alarmingDur/2, channel1, (alarmingDur + pulseDelay)*i + alarmingDur/2);
 
-        var waveFormGen = new WaveformGen();
-        waveFormGen.Square(100.0, slowDuration, 5, 0);
-        waveFormGen.LinearTrans(5, 0, slowSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
-        waveFormGen.LinearTrans(5, (slowDuration-slowSmooth), slowDuration, 1, 0);
-        waveFormGen.Square(100.0, slowDuration, 1, 0);
-        waveFormGen.LinearTrans(1, 0, slowSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
-        waveFormGen.LinearTrans(1, (slowDuration-slowSmooth), slowDuration, 1, 0);
-        waveFormGen.LinearTrans(5, 0, duration, squareAmp, squareAmp);
-        waveFormGen.LinearTrans(1, 0, duration, squareAmp, squareAmp);
-        FunctionDictionary.Add("SquareLinearSlow", new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat)); 
-        FunctionDictionary["SquareLinearSlow"].Play();
-    }
-    
-    [RelayCommand]
-    public void SquareLinearSlowStop()
-    {
-        if (FunctionDictionary.ContainsKey("SquareLinearSlow"))
-        {
-            FunctionDictionary["SquareLinearSlow"].Dispose();
-        }
-    }
-    
-    
-    
-    [RelayCommand]
-    public void SquareSmoothFastPlay()
-    {
-        Reset();
+                // waveFormGen.Sine(frequency, frequency-25, alarmingDur/2, channel2, (alarmingDur + pulseDelay)*i);
+                // waveFormGen.Sine(frequency, frequency, alarmingDur/2, channel2, (alarmingDur + pulseDelay)*i + alarmingDur/2);
+            }
+            else
+            {
+                // waveFormGen.Sine(frequency, frequency+25, alarmingDur/2, channel1, (alarmingDur + pulseDelay)*i);
+                // waveFormGen.Sine(frequency, frequency, alarmingDur/2, channel1, (alarmingDur + pulseDelay)*i + alarmingDur/2);
 
-        var waveFormGen = new WaveformGen();
-        waveFormGen.Square(100.0, fastDuration, 5, 0);
-        waveFormGen.SigmoidTrans(5, 0, fastSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
-        waveFormGen.SigmoidTrans(5, (fastDuration-fastSmooth), fastDuration, 1, 0);
-        waveFormGen.Square(100.0, fastDuration, 1, 0);
-        waveFormGen.SigmoidTrans(1, 0, fastSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
-        waveFormGen.SigmoidTrans(1, (fastDuration-fastSmooth), fastDuration, 1, 0);
-        waveFormGen.LinearTrans(5, 0, duration, squareAmp, squareAmp);
-        waveFormGen.LinearTrans(1, 0, duration, squareAmp, squareAmp);
-        FunctionDictionary.Add("SquareSmoothFast", new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat)); 
-        FunctionDictionary["SquareSmoothFast"].Play();
-    }
-    
-    [RelayCommand]
-    public void SquareSmoothFastStop()
-    {
-        if (FunctionDictionary.ContainsKey("SquareSmoothFast"))
-        {
-            FunctionDictionary["SquareSmoothFast"].Dispose();
+                // waveFormGen.Sine(frequency, frequency+25, alarmingDur/2, channel2, (alarmingDur + pulseDelay)*i);
+                // waveFormGen.Sine(frequency, frequency, alarmingDur/2, channel2, (alarmingDur + pulseDelay)*i + alarmingDur/2);
+            }
         }
+        streamer = new ByteStream(waveFormGen.ByteStreams, waveFormGen.WaveFormat); 
+        streamer.Play();
     }
     
-    
-    [RelayCommand]
-    public void SquareSmoothSlowPlay()
-    {
-        Reset();
-
-        var waveFormGen = new WaveformGen();
-        waveFormGen.Square(100.0, slowDuration, 5, 0);
-        waveFormGen.SigmoidTrans(5, 0, slowSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
-        waveFormGen.SigmoidTrans(5, (slowDuration-slowSmooth), slowDuration, 1, 0);
-        waveFormGen.Square(100.0, slowDuration, 1, 0);
-        waveFormGen.SigmoidTrans(1, 0, slowSmooth, 0, 1); // int channelNo, double startTime, double endTime, double startVal, double endVal
-        waveFormGen.SigmoidTrans(1, (slowDuration-slowSmooth), slowDuration, 1, 0);
-        waveFormGen.LinearTrans(5, 0, duration, squareAmp, squareAmp);
-        waveFormGen.LinearTrans(1, 0, duration, squareAmp, squareAmp);
-        FunctionDictionary.Add("SquareSmoothSlow", new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat)); 
-        FunctionDictionary["SquareSmoothSlow"].Play();
-    }
-    
-    [RelayCommand]
-    public void SquareSmoothSlowStop()
-    {
-        if (FunctionDictionary.ContainsKey("SquareSmoothFlow"))
-        {
-            FunctionDictionary["SquareSmoothSlow"].Dispose();
-        }
-    }
-
     private void Reset()
     {
-        foreach (KeyValuePair<string, ByteStream> entry in FunctionDictionary)
-        {
-            entry.Value.Dispose();
-        }
-
-        if (FunctionDictionary.Count > 0) FunctionDictionary.Clear();
+        if (streamer != null) streamer.Dispose();
     }
 }

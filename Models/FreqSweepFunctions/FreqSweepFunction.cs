@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 
 namespace Haptics_GUI.Models.FreqSweepFunctions;
 
@@ -8,13 +9,14 @@ public abstract class FreqSweepFunction
     protected double endFreq;
     
     private readonly double dur;
-    //protected double start;
     public double startPhase;
     public double endPhase; // Continuously updated by func
     
     protected int samplingRate;
     private int bitDepth;
-    protected int channel;
+    protected int sampleCount;
+
+    public double[] rawSamples;
     public byte[] Waveform;
 
     
@@ -29,35 +31,35 @@ public abstract class FreqSweepFunction
         endPhase = 0;
         samplingRate = inSamplingRate;
         bitDepth = inBitDepth;
+        sampleCount = (int)((double)samplingRate * dur);
         channel = inChannel;
+        
+        rawSamples = new double[sampleCount];
     }
 
-    public abstract double Func(int numberOfSamples, int i);
-    
-    public void Generate()
+    public abstract double Func(int i);
+
+    public void Encode()
     {
-        var noOfSamples = (int)((double)samplingRate * dur);
-        var byteLength = noOfSamples * bitDepth / 8;
-        
+        var byteLength = sampleCount * bitDepth / 8;
+
         Waveform = new byte[byteLength];
         
-        for (int i = 0; i < noOfSamples; i++)
+        for (int i = 0; i < sampleCount; i++)
         {
-            double sampleValue = Func(noOfSamples, i);
-
             byte[] valueBytes;
             switch (bitDepth)
             {
                 case 8:
-                    valueBytes = [(byte)(sampleValue * 127 + 128)]; // 8-bit audio is unsigned
+                    valueBytes = [(byte)(rawSamples[i] * 127 + 128)]; // 8-bit audio is unsigned
                     break;
                 
                 case 16:
-                    valueBytes = BitConverter.GetBytes((short)(sampleValue * short.MaxValue));
+                    valueBytes = BitConverter.GetBytes((short)(rawSamples[i] * short.MaxValue));
                     break;
                 
                 default:
-                    valueBytes = BitConverter.GetBytes((uint)(sampleValue * uint.MaxValue));
+                    valueBytes = BitConverter.GetBytes((uint)(rawSamples[i] * uint.MaxValue));
                     break;
             }
             
@@ -67,5 +69,15 @@ public abstract class FreqSweepFunction
                 Waveform[byteIndex + j] = valueBytes[j];
             }
         }
+    }
+    
+    public void Generate()
+    {
+        for (int i = 0; i < sampleCount; i++)
+        {
+            rawSamples[i] = Func(i);
+        }
+        
+        Encode();
     }
 }

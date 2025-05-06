@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Haptics_GUI.Models.FreqSweepFunctions;
 using Haptics_GUI.Models.Functions;
 using Haptics_GUI.Models.Transitions;
@@ -13,6 +14,7 @@ public class FreqSweepWaveformGen
     public int SamplingRate;
     public byte BitDepth;
     public List<byte[]> ByteStreams;
+    public List<double[]> rawSamples;
 
     public List<List<PhaseOffset>> PhaseOffsets;
     
@@ -22,15 +24,15 @@ public class FreqSweepWaveformGen
     public class PhaseOffset
     {
         public double Phase;
-        public double Timestamp;
+        public int Timestamp;
 
         public PhaseOffset()
         {
             Phase = 0.0;
-            Timestamp = 0.0;
+            Timestamp = 0;
         }
 
-        public PhaseOffset(double phase, double timestamp)
+        public PhaseOffset(double phase, int timestamp)
         {
             Phase = phase;
             Timestamp = timestamp;
@@ -43,6 +45,7 @@ public class FreqSweepWaveformGen
         BitDepth = 16;
         longestTrack = 0;
         ByteStreams = new List<byte[]>();
+        rawSamples = new List<double[]>();
         PhaseOffsets = new List<List<PhaseOffset>>();
     }
 
@@ -52,6 +55,7 @@ public class FreqSweepWaveformGen
         BitDepth = (byte)bitDepth;
         longestTrack = 0;
         ByteStreams = new List<byte[]>();
+        rawSamples = new List<double[]>();
         PhaseOffsets = new List<List<PhaseOffset>>();
     }
     
@@ -63,6 +67,7 @@ public class FreqSweepWaveformGen
         while (ByteStreams.Count <= channelNo) // Check if channel exists
         {
             ByteStreams.Add(new byte[byteLength]); // Create channels if needed
+            rawSamples.Add(new double[noOfSamples]);
             WaveFormat = new WaveFormat(SamplingRate, BitDepth, ByteStreams.Count);
             PhaseOffsets.Add(new List<PhaseOffset>());
         }
@@ -72,6 +77,13 @@ public class FreqSweepWaveformGen
             Array.Resize(ref temp, byteLength);
             ByteStreams[channelNo] = temp;
         }
+        
+        if (rawSamples[channelNo].Length < noOfSamples) {
+            var temp = rawSamples[channelNo];
+            Array.Resize(ref temp, noOfSamples);
+            rawSamples[channelNo] = temp;
+        }
+        
     }
     
     private void PadChannels (double dur)
@@ -88,6 +100,17 @@ public class FreqSweepWaveformGen
                 ByteStreams[i] = temp;
             }
         }
+        
+        newSize = (int)(SamplingRate * longestTrack);
+        for (int i=0; i<rawSamples.Count; i++) // Not foreach because we need the index
+        {
+            if (rawSamples[i].Length < newSize)
+            {
+                double[] temp = rawSamples[i];
+                Array.Resize(ref temp, newSize); // Pad the end of the array with zeroes (tested)
+                rawSamples[i] = temp;
+            }
+        }
     }
     
     public void Sine (double startFreq, double endFreq, double dur, int channelNo, double start)
@@ -95,7 +118,7 @@ public class FreqSweepWaveformGen
         SpawnChannel(channelNo, dur, start);
         
         // Finding phase of last waveform
-        var phaseOffsetList = PhaseOffsets[channelNo].Where(p => p.Timestamp == start * SamplingRate).ToList();
+        var phaseOffsetList = PhaseOffsets[channelNo].Where(p => p.Timestamp == (int)(start * SamplingRate)).ToList();
         if (phaseOffsetList.Count > 1)
         {
             throw new Exception("Phase offset list has multiple elements at the same timestamp");
@@ -111,11 +134,7 @@ public class FreqSweepWaveformGen
         sine.Generate();
         PadChannels(dur + start);
         
-        PhaseOffsets[channelNo].Add(new PhaseOffset(sine.endPhase, (start + dur) * SamplingRate));
-        
-        /*
-         * cleaning waveforms before playing
-         */
+        PhaseOffsets[channelNo].Add(new PhaseOffset(sine.endPhase, (int)((start + dur) * SamplingRate)));
 
         var offset = (int)((double)SamplingRate * start * BitDepth / 8);
         Array.Copy(sine.Waveform, 0, ByteStreams[channelNo], offset, sine.Waveform.Length);
@@ -136,6 +155,30 @@ public class FreqSweepWaveformGen
         sigmoid.Generator();
         // Array.Copy(linear.resultData, 0, ByteStreams[channelNo], 0, linear.resultData.Length);
         ByteStreams[channelNo] = sigmoid.resultData;
+    }
+
+    public void CleanWaveforms()
+    {
+        for (var i = 0; i < ByteStreams.Count; i++)
+        {
+            // Only single phase offsets have to cleaned up
+            var singlePhaseOffsets = PhaseOffsets[i].GroupBy(p => p.Timestamp).Where(g => g.Count() == 1).ToList();
+            foreach (var phaseOffset in singlePhaseOffsets)
+            {
+                var index = phaseOffset.Key - 1;
+                if
+               
+                // If opposing signs +1 + (-1) = 0, -2 or 2 otherwise
+                bool signChange = Math.Sign(rawSamples[i][index + 1]) + Math.Sign(rawSamples[i][index]) == 0;
+                while (signChange )
+                {
+                    //ByteStreams[i][index] = (byte)zeroLevel;
+                    
+                    index--;
+                    signChange = Math.Sign(rawSamples[i][index + 1]) + Math.Sign(rawSamples[i][index]) == 0;
+                }
+            }
+        }
     }
 
 }

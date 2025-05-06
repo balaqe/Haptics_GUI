@@ -146,16 +146,21 @@ public partial class MainWindowViewModel : ViewModelBase
 
         Reset();
 
-        var waveFormGen = new FreqSweepWaveformGen(44100, 16);
+        //edited
+        var waveFormGen = new FreqSweepWaveformGen(1000, 8);
 
         frequency = 100;
 
         for (int i=0; i<pulseCount; i++)
         {
             waveFormGen.Sine(frequency, frequency, alarmingDur, channel1, (alarmingDur + pulseDelay)*i);
+            // TEMP
+            waveFormGen.Sine(frequency, frequency, alarmingDur, channel1, (alarmingDur + pulseDelay)*i+alarmingDur);
+            
             waveFormGen.Sine(frequency, frequency, alarmingDur, channel2, (alarmingDur + pulseDelay)*i);
         }
 
+        waveFormGen.CleanWaveforms();
         streamer = new ByteStream(waveFormGen.ByteStreams, waveFormGen.WaveFormat); 
         streamer.Play();
     }

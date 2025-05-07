@@ -144,14 +144,15 @@ public partial class MainWindowViewModel : ViewModelBase
         Reset();
 
         //edited
-        var foo = new WaveformGen(1);
+        //var foo = new WaveformGen(1);
+        var foo = new WaveformGen(44100, 16, 1);
         //var waveFormGen = new FreqSweepWaveformGen(1000, 8);
 
         frequency = 100;
 
         for (int i=0; i<pulseCount; i++)
         {
-            foo.Sine(0, 0, 1, frequency, frequency);
+            foo.Sine(0, 0, 1, 100, 100);
             foo.Encode();
             /*
             waveFormGen.Sine(frequency, frequency, alarmingDur, channel1, (alarmingDur + pulseDelay)*i);

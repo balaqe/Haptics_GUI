@@ -103,7 +103,11 @@ public class Bakery
     {}
 
 
-
+    public void PrepareForBaking()
+    {
+        Array.Copy(rawSamples, 0, BakedSamples, 0, rawSamples.Length);
+    }
+    
     private void ApplyTransitions()
     {
         if (Transitions.Count == 0) return;
@@ -143,11 +147,14 @@ public class Bakery
             while (index > 0 && signChange != true)
             {
                 // If opposing signs +1 + (-1) = 0
-                signChange = Math.Sign(BakedSamples[index + 1]) + Math.Sign(BakedSamples[index - 1]) == 0;
-
-                BakedSamples[index] = 0;
+                signChange = Math.Sign(BakedSamples[index + 1]) + Math.Sign(BakedSamples[index - 1]) == 0 ? true : false;
                 
                 index--;
+            }
+
+            for (int i = index; i < BakedSamples.Length; i++)
+            {
+                BakedSamples[i] = 0;
             }
         }
     }
@@ -155,6 +162,7 @@ public class Bakery
 
     public void Bake()
     {
+        PrepareForBaking();
         ApplyTransitions();
         Cleanup();
     }

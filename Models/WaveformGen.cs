@@ -53,6 +53,24 @@ public class WaveformGen
         PadChannels();
     }
     
+    public void Square(int channel, double startTime, double duration, double startFreq, double endFreq)
+    {
+        if (Channels.Count <= channel)
+        {
+            Channels.Add(new Bakery(Format));
+        }
+        Channels[channel].GenerateSquare(startTime, duration, startFreq, endFreq);
+        PadChannels();
+    }
+
+    public void Sigmoid(int channel, double startTime, double duration, double startVal, double endVal)
+    {
+        if (Channels.Count <= channel)
+        {
+            Channels.Add(new Bakery(Format));
+        }
+        Channels[channel].GenerateSigmoidTransition(startTime, duration, startVal, endVal);
+    }
 
 
 

@@ -7,7 +7,7 @@ public abstract class Function
     protected double startFreq;
     protected double endFreq;
     
-    private readonly double dur;
+    protected readonly double dur;
     public double startPhase;
     public double endPhase; // Continuously updated by func
     

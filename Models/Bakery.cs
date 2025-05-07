@@ -66,7 +66,7 @@ public class Bakery
         }
     }
 
-    public void GenerateSigmoidTransition(double duration, int startTime, double inStartVal, double inEndVal)
+    public void GenerateSigmoidTransition(double startTime, double duration, double inStartVal, double inEndVal)
     {
         Transitions.Add(new Sigmoid(_format, duration, startTime, inStartVal, inEndVal));
         Transitions.Last().Generate();
@@ -98,9 +98,33 @@ public class Bakery
         var offset = (int)(startTime * _format.SamplingRate);
         Array.Copy(sine.rawSamples, 0, rawSamples, offset, sine.rawSamples.Length);
     }
-    
-    public void GenerateSquare()
-    {}
+
+    public void GenerateSquare(double startTime, double duration, double startFreq, double endFreq)
+    {
+        var phaseOffsetList = PhaseOffsets.Where(p => p.Timestamp == (int)(startTime * _format.SamplingRate)).ToList();
+        if (phaseOffsetList.Count > 1)
+        {
+            throw new Exception("Phase offset list has multiple elements at the same timestamp");
+        }
+
+        if (phaseOffsetList.Count == 0)
+        {
+            phaseOffsetList.Add(new PhaseOffset(0, 0));
+        }
+
+        var phaseOffset = phaseOffsetList[0];
+
+        Function square = new Square(_format, startFreq, endFreq, duration, phaseOffset.Phase);
+        square.Generate();
+
+        // Padding until end
+        PadSamples((int)((startTime + duration) * _format.SamplingRate));
+
+        PhaseOffsets.Add(new PhaseOffset(square.endPhase, (int)((startTime + duration) * _format.SamplingRate)));
+
+        var offset = (int)(startTime * _format.SamplingRate);
+        Array.Copy(square.rawSamples, 0, rawSamples, offset, square.rawSamples.Length);
+    }
 
 
     public void PrepareForBaking()

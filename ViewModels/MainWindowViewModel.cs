@@ -152,8 +152,11 @@ public partial class MainWindowViewModel : ViewModelBase
 
         for (int i=0; i<pulseCount; i++)
         {
+            /*
             foo.Sine(0, 0, 1, 100, 100);
-            foo.Encode();
+            */
+            foo.Square(0, 0, 1, 100, 100);
+            foo.Sigmoid(0, 0, 1, 1, 0);
             /*
             waveFormGen.Sine(frequency, frequency, alarmingDur, channel1, (alarmingDur + pulseDelay)*i);
             // TEMP
@@ -161,6 +164,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
             waveFormGen.Sine(frequency, frequency, alarmingDur, channel2, (alarmingDur + pulseDelay)*i);
             */
+            foo.Encode();
         }
 
         //waveFormGen.CleanWaveforms();

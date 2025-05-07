@@ -1,7 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Security.Cryptography;
-using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Haptics_GUI.Models;
@@ -147,21 +144,27 @@ public partial class MainWindowViewModel : ViewModelBase
         Reset();
 
         //edited
-        var waveFormGen = new FreqSweepWaveformGen(1000, 8);
+        var foo = new WaveformGen(1);
+        //var waveFormGen = new FreqSweepWaveformGen(1000, 8);
 
         frequency = 100;
 
         for (int i=0; i<pulseCount; i++)
         {
+            foo.Sine(0, 0, 1, frequency, frequency);
+            foo.Encode();
+            /*
             waveFormGen.Sine(frequency, frequency, alarmingDur, channel1, (alarmingDur + pulseDelay)*i);
             // TEMP
             waveFormGen.Sine(frequency, frequency, alarmingDur, channel1, (alarmingDur + pulseDelay)*i+alarmingDur);
-            
+
             waveFormGen.Sine(frequency, frequency, alarmingDur, channel2, (alarmingDur + pulseDelay)*i);
+            */
         }
 
-        waveFormGen.CleanWaveforms();
-        streamer = new ByteStream(waveFormGen.ByteStreams, waveFormGen.WaveFormat); 
+        //waveFormGen.CleanWaveforms();
+        //streamer = new ByteStream(waveFormGen.ByteStreams, waveFormGen.WaveFormat); 
+        streamer = new ByteStream(foo.ByteStreams, foo.waveFormat); 
         streamer.Play();
     }
 
@@ -188,6 +191,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         Reset();
 
+        /*
         var waveFormGen = new FreqSweepWaveformGen(44100, 16);
         for (int i=0; i<pulseCount; i++)
         {
@@ -196,6 +200,7 @@ public partial class MainWindowViewModel : ViewModelBase
         }
         streamer = new ByteStream(waveFormGen.ByteStreams, waveFormGen.WaveFormat); 
         streamer.Play();
+        */
     }
 
     [RelayCommand]
@@ -218,6 +223,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         Reset();
 
+        /*
         var waveFormGen = new FreqSweepWaveformGen(44100, 16);
         for (int i=0; i<pulseCount; i++)
         {
@@ -226,6 +232,7 @@ public partial class MainWindowViewModel : ViewModelBase
         }
         streamer = new ByteStream(waveFormGen.ByteStreams, waveFormGen.WaveFormat); 
         streamer.Play();
+        */
     }
     
     [RelayCommand]
@@ -234,6 +241,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         Reset();
 
+        /*
         var waveFormGen = new FreqSweepWaveformGen(44100, 16);
         for (int i=0; i<pulseCount; i++)
         {
@@ -272,6 +280,7 @@ public partial class MainWindowViewModel : ViewModelBase
         }
         streamer = new ByteStream(waveFormGen.ByteStreams, waveFormGen.WaveFormat); 
         streamer.Play();
+        */
     }
 
     [RelayCommand]
@@ -323,6 +332,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         Reset();
 
+        /*
         var waveFormGen = new FreqSweepWaveformGen(44100, 16);
         for (int i=0; i<pulseCount; i++)
         {
@@ -361,6 +371,7 @@ public partial class MainWindowViewModel : ViewModelBase
         }
         streamer = new ByteStream(waveFormGen.ByteStreams, waveFormGen.WaveFormat); 
         streamer.Play();
+        */
     }
     
     private void Reset()

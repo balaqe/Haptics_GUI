@@ -1,60 +1,48 @@
-using System;
-
 namespace Haptics_GUI.Models.Functions;
 
 public abstract class Function
 {
-    public double freq;
-    public double dur;
-    public int channel;
-    public int start;
-    public int samplingRate;
-    public int bitDepth;
-    public byte[] waveform;
-    public abstract double Func(double inFreq, int inSamplingRate, int i);
+    protected Format format;
+    
+    protected double startFreq;
+    protected double endFreq;
+    
+    private readonly double dur;
+    public double startPhase;
+    public double endPhase; // Continuously updated by func
+    
+    protected int sampleCount;
+    public double[] rawSamples;
 
-    public Function(double inFreq, double inDur, int inChannel, int inSamplingRate, int inBitDepth)
+    
+    protected Function(Format inFormat, double inStartFreq, 
+        double inEndFreq, double inDur, double inStartPhase)
     {
-        freq = inFreq;
+        format = inFormat;
+        startFreq = inStartFreq;
+        endFreq = inEndFreq;
         dur = inDur;
-        channel = inChannel;
-        samplingRate = inSamplingRate;
-        bitDepth = inBitDepth;
-        // Generator();
+        startPhase = inStartPhase;
+        endPhase = 0;
+        sampleCount = (int)(format.SamplingRate * inDur);
+        rawSamples = new double[sampleCount];
     }
 
-    public void Generator()
+    protected Function(Format inFormat, double inDur)
     {
-        int noOfSamples = (int)((double)samplingRate * dur);
-        int byteLength = noOfSamples * bitDepth / 8;
-        
-        waveform = new byte[byteLength];
+        format = inFormat;
+        startFreq = inDur;
+        sampleCount = (int)(format.SamplingRate * inDur);
+        rawSamples = new double[sampleCount];
+    }
 
-        for (int i = 0; i < noOfSamples; i++)
+    public abstract double Func(int i);
+
+    public void Generate()
+    {
+        for (int i = 0; i < sampleCount; i++)
         {
-            double sampleValue = Func(freq, samplingRate, i);
-
-            byte[] valueBytes;
-            switch (bitDepth)
-            {
-                case 8:
-                    valueBytes = new byte[] { (byte)(sampleValue * 127 + 128) }; // 8-bit audio is unsigned
-                    break;
-                
-                case 16:
-                    valueBytes = BitConverter.GetBytes((short)(sampleValue * short.MaxValue));
-                    break;
-                
-                default:
-                    valueBytes = BitConverter.GetBytes((uint)(sampleValue * uint.MaxValue));
-                    break;
-            }
-            
-            int byteIndex = i * (bitDepth / 8);
-            for (int j = 0; j < bitDepth/8; j += 1)
-            {
-                waveform[byteIndex + j] = valueBytes[j];
-            }
+            rawSamples[i] = Func(i);
         }
     }
 }

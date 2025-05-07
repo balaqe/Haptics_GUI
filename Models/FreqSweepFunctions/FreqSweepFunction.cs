@@ -1,10 +1,10 @@
 using System;
-using System.Threading;
 
 namespace Haptics_GUI.Models.FreqSweepFunctions;
 
 public abstract class FreqSweepFunction
 {
+    /*
     protected double startFreq;
     protected double endFreq;
     
@@ -32,7 +32,6 @@ public abstract class FreqSweepFunction
         samplingRate = inSamplingRate;
         bitDepth = inBitDepth;
         sampleCount = (int)((double)samplingRate * dur);
-        channel = inChannel;
         
         rawSamples = new double[sampleCount];
     }
@@ -80,4 +79,5 @@ public abstract class FreqSweepFunction
         
         Encode();
     }
+    */
 }

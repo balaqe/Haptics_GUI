@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
-using NAudio.Wave.SampleProviders;
 
 namespace Haptics_GUI.Models;
 

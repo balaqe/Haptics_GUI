@@ -1,7 +1,6 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using NAudio.CoreAudioApi;
+using System.Linq;
 using NAudio.Wave;
 using Haptics_GUI.Models.Functions;
 using Haptics_GUI.Models.Transitions;
@@ -10,39 +9,54 @@ namespace Haptics_GUI.Models;
 
 public class WaveformGen
 {
-    public int SamplingRate;
-    public byte BitDepth;
-    public List<byte[]> ByteStreams;
+    public Format Format;
     public WaveFormat waveFormat;
-    private double longestTrack;
+    
+    public List<Bakery> Channels;
+    public List<byte[]> ByteStreams;
 
-    public WaveformGen() // Default constructor
+    public WaveformGen(int inSamplingRate, int inBitDepth, int inChannels)
     {
-        SamplingRate = 44100;
-        BitDepth = 16;
-        longestTrack = 0;
+        Format = new Format(inSamplingRate, inBitDepth, inChannels);
+        waveFormat = new WaveFormat(inSamplingRate, inBitDepth, inChannels);
+        Channels = new List<Bakery>();
+        ByteStreams = new List<byte[]>();
+    }
+    
+    public WaveformGen(int inChannels)
+    {
+        Format = new Format(inChannels);
+        waveFormat = new WaveFormat(Format.SamplingRate, Format.BitDepth, inChannels);
+        Channels = new List<Bakery>();
         ByteStreams = new List<byte[]>();
     }
 
-    public WaveformGen(int samplingRate, int bitDepth) // Custom constructor
+    public void PadChannels()
     {
-        SamplingRate = samplingRate;
-        BitDepth = (byte)bitDepth;
-        longestTrack = 0;
-        ByteStreams = new List<byte[]>();
+        if (Channels == null || Channels.Count == 0) return;
+        
+        var longestChannelLength = Channels.Max(b => b.BakedSamples.Length);
+        foreach (var channel in Channels)
+        {
+            channel.PadSamples(longestChannelLength);
+        }
     }
 
-    public void Sine (double freq, double dur, int channelNo, int start)
+    // Channels start at 0
+    public void Sine(int channel, double startTime, double duration, double startFreq, double endFreq)
     {
-        spawnChannel(channelNo, dur, start);
-        Function sine = new Sine(freq, dur, channelNo, SamplingRate, BitDepth);
-        sine.Generator();
-        padChannels(dur);
-
-        int offset = (int)((double)SamplingRate * start * BitDepth / 8);
-        Array.Copy(sine.waveform, 0, ByteStreams[channelNo], offset, sine.waveform.Length);
+        if (Channels.Count <= channel)
+        {
+            Channels.Add(new Bakery(Format));
+        }
+        Channels[channel].GenerateSine(startTime, duration, startFreq, endFreq);
+        PadChannels();
     }
+    
 
+
+
+    /*
     public void Square (double freq, double dur, int channelNo, int start)
     {
         spawnChannel(channelNo, dur, start);
@@ -87,7 +101,9 @@ public class WaveformGen
             ByteStreams[channelNo] = temp;
         }
     }
+    */
 
+    /*
     private void padChannels (double dur)
     {
         if (dur > longestTrack) longestTrack = dur;
@@ -100,6 +116,48 @@ public class WaveformGen
                 byte[] temp = ByteStreams[i];
                 Array.Resize(ref temp, newSize); // Pad the end of the array with zeroes (tested)
                 ByteStreams[i] = temp;
+            }
+        }
+    }
+    */
+    
+    
+    
+    public void Encode()
+    {
+        ByteStreams.Clear();
+        PadChannels();
+        var longestChannelLength = Channels.Max(b => b.BakedSamples.Length);
+        foreach (var channel in Channels)
+        {
+            channel.Bake();
+            
+            var byteLength = longestChannelLength * (Format.BitDepth / 8);
+            ByteStreams.Add(new byte[byteLength]);
+            
+            for (int i = 0; i < longestChannelLength; i++)
+            {
+                byte[] valueBytes;
+                switch (Format.BitDepth)
+                {
+                    case 8:
+                        valueBytes = [(byte)(channel.BakedSamples[i] * 127 + 128)]; // 8-bit audio is unsigned
+                        break;
+                
+                    case 16:
+                        valueBytes = BitConverter.GetBytes((short)(channel.BakedSamples[i] * short.MaxValue));
+                        break;
+                
+                    default:
+                        valueBytes = BitConverter.GetBytes((uint)(channel.BakedSamples[i] * uint.MaxValue));
+                        break;
+                }
+            
+                var byteIndex = i * (Format.BitDepth / 8);
+                for (var j = 0; j < Format.BitDepth/8; j += 1)
+                {
+                    ByteStreams.Last()[byteIndex + j] = valueBytes[j];
+                }
             }
         }
     }

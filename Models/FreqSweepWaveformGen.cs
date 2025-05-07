@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using Haptics_GUI.Models.FreqSweepFunctions;
-using Haptics_GUI.Models.Functions;
 using Haptics_GUI.Models.Transitions;
 using NAudio.Wave;
 
@@ -11,6 +9,7 @@ namespace Haptics_GUI.Models;
 
 public class FreqSweepWaveformGen
 {
+    /*
     public int SamplingRate;
     public byte BitDepth;
     public List<byte[]> ByteStreams;
@@ -21,23 +20,6 @@ public class FreqSweepWaveformGen
     public WaveFormat WaveFormat;
     private double longestTrack;
     
-    public class PhaseOffset
-    {
-        public double Phase;
-        public int Timestamp;
-
-        public PhaseOffset()
-        {
-            Phase = 0.0;
-            Timestamp = 0;
-        }
-
-        public PhaseOffset(double phase, int timestamp)
-        {
-            Phase = phase;
-            Timestamp = timestamp;
-        }
-    }
 
     public FreqSweepWaveformGen() // Default constructor
     {
@@ -180,5 +162,49 @@ public class FreqSweepWaveformGen
             }
         }
     }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    public void Encode()
+    {
+        var byteLength = sampleCount * bitDepth / 8;
+
+        Waveform = new byte[byteLength];
+        
+        for (int i = 0; i < sampleCount; i++)
+        {
+            byte[] valueBytes;
+            switch (bitDepth)
+            {
+                case 8:
+                    valueBytes = [(byte)(rawSamples[i] * 127 + 128)]; // 8-bit audio is unsigned
+                    break;
+                
+                case 16:
+                    valueBytes = BitConverter.GetBytes((short)(rawSamples[i] * short.MaxValue));
+                    break;
+                
+                default:
+                    valueBytes = BitConverter.GetBytes((uint)(rawSamples[i] * uint.MaxValue));
+                    break;
+            }
+            
+            var byteIndex = i * (bitDepth / 8);
+            for (var j = 0; j < bitDepth/8; j += 1)
+            {
+                Waveform[byteIndex + j] = valueBytes[j];
+            }
+        }
+    }
+    */
 
 }

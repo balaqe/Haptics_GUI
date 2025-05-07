@@ -1,6 +1,5 @@
 ﻿using Avalonia;
 using System;
-using System.Diagnostics;
 
 namespace Haptics_GUI;
 

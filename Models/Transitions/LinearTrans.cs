@@ -1,10 +1,9 @@
-using System;
-
 namespace Haptics_GUI.Models.Transitions;
 
-public class Linear : Transition
+public class Linear
 {
     // private double m;
+    /*
 
     public Linear(byte[] inData, double inStartTime, double inEndTime, double inStartVal, double inEndVal,
         int inBitDepth, int inSampRate)
@@ -18,4 +17,5 @@ public class Linear : Transition
         double m = (i - startSample) / (double)(endSample - startSample);
         return startVal + m * (endVal - startVal); 
     }
+    */
 }

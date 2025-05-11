@@ -1,21 +1,12 @@
+using Haptics_GUI.Models.Functions;
+
 namespace Haptics_GUI.Models.Transitions;
 
-public class Linear
+public class Linear(Format format, double inDur, double startTime, double inStartVal, double inEndVal) : Transition(format, inDur, startTime, inStartVal, inEndVal)
 {
-    // private double m;
-    /*
-
-    public Linear(byte[] inData, double inStartTime, double inEndTime, double inStartVal, double inEndVal,
-        int inBitDepth, int inSampRate)
-        : base(inData, inStartTime, inEndTime, inStartVal, inEndVal, inBitDepth, inSampRate)
-    {
-        // m = (endVal - startVal) / (endSample - startSample);
-    }
-
     public override double Func(int i)
     {
-        double m = (i - startSample) / (double)(endSample - startSample);
+        double m = (double)i / (double)(sampleCount);
         return startVal + m * (endVal - startVal); 
     }
-    */
 }

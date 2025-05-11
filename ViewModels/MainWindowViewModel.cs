@@ -95,8 +95,8 @@ public partial class MainWindowViewModel : ViewModelBase
         count1 = true;
         count2 = false;
         count3 = false;
-        channel1 = 1;
-        channel2 = 0;
+        channel1 = 0;
+        channel2 = 1;
         pulseDelay = 0.2;
         // duration = 0.2;
         // fastDuration = 0.2;
@@ -143,10 +143,8 @@ public partial class MainWindowViewModel : ViewModelBase
 
         Reset();
 
-        //edited
-        //var foo = new WaveformGen(1);
-        var foo = new WaveformGen(44100, 16, 1);
-        //var waveFormGen = new FreqSweepWaveformGen(1000, 8);
+        //var foo = new WaveformGen(44100, 16, 2);
+        var waveFormGen = new WaveformGen(44100, 16, 2);
 
         frequency = 100;
 
@@ -154,22 +152,17 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             /*
             foo.Sine(0, 0, 1, 100, 100);
+            foo.Linear(0, 0, 1, 1, 0);
+            foo.Sine(1, 1, 1, 200, 300);
+            foo.Linear(1, 1, 1, 0.5, 1);
+            //foo.Encode();
             */
-            foo.Square(0, 0, 1, 100, 100);
-            foo.Sigmoid(0, 0, 1, 1, 0);
-            /*
-            waveFormGen.Sine(frequency, frequency, alarmingDur, channel1, (alarmingDur + pulseDelay)*i);
-            // TEMP
-            waveFormGen.Sine(frequency, frequency, alarmingDur, channel1, (alarmingDur + pulseDelay)*i+alarmingDur);
-
-            waveFormGen.Sine(frequency, frequency, alarmingDur, channel2, (alarmingDur + pulseDelay)*i);
-            */
-            foo.Encode();
+            waveFormGen.Sine(channel1, (alarmingDur + pulseDelay)*i, alarmingDur, frequency, frequency);
+            waveFormGen.Sine(channel2, (alarmingDur + pulseDelay)*i, alarmingDur, frequency, frequency);
         }
+        waveFormGen.Encode();
 
-        //waveFormGen.CleanWaveforms();
-        //streamer = new ByteStream(waveFormGen.ByteStreams, waveFormGen.WaveFormat); 
-        streamer = new ByteStream(foo.ByteStreams, foo.waveFormat); 
+        streamer = new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat); 
         streamer.Play();
     }
 
@@ -195,6 +188,17 @@ public partial class MainWindowViewModel : ViewModelBase
         // Console.WriteLine("Freq: " + frequency);
 
         Reset();
+        
+        var waveFormGen = new WaveformGen(44100, 16, 2);
+        for (int i=0; i<pulseCount; i++)
+        {
+            waveFormGen.Sine(channel1, (alarmingDur + pulseDelay)*i, alarmingDur, frequency, frequency);
+            waveFormGen.Sine(channel2, (alarmingDur + pulseDelay)*i, alarmingDur, frequency, frequency);
+        }
+
+        waveFormGen.Encode();
+        streamer = new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat); 
+        streamer.Play();
 
         /*
         var waveFormGen = new FreqSweepWaveformGen(44100, 16);
@@ -227,6 +231,18 @@ public partial class MainWindowViewModel : ViewModelBase
         // Console.WriteLine("Freq: " + frequency);
 
         Reset();
+        
+        
+        var waveFormGen = new WaveformGen(44100, 16, 2);
+        for (int i=0; i<pulseCount; i++)
+        {
+            waveFormGen.Sine(channel1, (alarmingDur + pulseDelay)*i, alarmingDur, frequency, frequency);
+            waveFormGen.Sine(channel2, (alarmingDur + pulseDelay)*i, alarmingDur, frequency, frequency);
+        }
+
+        waveFormGen.Encode();
+        streamer = new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat); 
+        streamer.Play();
 
         /*
         var waveFormGen = new FreqSweepWaveformGen(44100, 16);
@@ -245,6 +261,48 @@ public partial class MainWindowViewModel : ViewModelBase
     {
 
         Reset();
+        var waveFormGen = new WaveformGen(44100, 16, 2);
+        for (int i=0; i<pulseCount; i++)
+        {
+            if (sweep1)
+            {
+                waveFormGen.Sine(channel1, (alarmingDur + pulseDelay)*i, alarmingDur, frequency-25, frequency);
+                waveFormGen.Sine(channel2, (alarmingDur + pulseDelay)*i, alarmingDur, frequency-25, frequency);
+            }
+            else if (sweep2)
+            {
+                waveFormGen.Sine(channel1, (alarmingDur + pulseDelay)*i, alarmingDur, frequency+25, frequency);
+                waveFormGen.Sine(channel2, (alarmingDur + pulseDelay)*i, alarmingDur, frequency+25, frequency);
+            }
+            else if (sweep3)
+            {
+                waveFormGen.Sine(channel1, (alarmingDur + pulseDelay)*i, alarmingDur, frequency, frequency-25);
+                //waveFormGen.Sine(channel1, (alarmingDur + pulseDelay)*i + alarmingDur/2, alarmingDur/2, frequency, frequency-25);
+                // waveFormGen.Sine(frequency, frequency-25, alarmingDur/2, channel1, (alarmingDur + pulseDelay)*i);
+                // waveFormGen.Sine(frequency, frequency, alarmingDur/2, channel1, (alarmingDur + pulseDelay)*i + alarmingDur/2);
+
+                waveFormGen.Sine(channel2, (alarmingDur + pulseDelay)*i, alarmingDur, frequency, frequency-25);
+                //waveFormGen.Sine(channel2, (alarmingDur + pulseDelay)*i + alarmingDur/2, alarmingDur/2, frequency, frequency-25);
+                // waveFormGen.Sine(frequency, frequency-25, alarmingDur/2, channel2, (alarmingDur + pulseDelay)*i);
+                // waveFormGen.Sine(frequency, frequency, alarmingDur/2, channel2, (alarmingDur + pulseDelay)*i + alarmingDur/2);
+            }
+            else
+            {
+                waveFormGen.Sine(channel1, (alarmingDur + pulseDelay)*i, alarmingDur, frequency, frequency+25);
+                //waveFormGen.Sine(channel1, (alarmingDur + pulseDelay)*i + alarmingDur/2, alarmingDur/2, frequency, frequency+25);
+                // waveFormGen.Sine(frequency, frequency+25, alarmingDur/2, channel1, (alarmingDur + pulseDelay)*i);
+                // waveFormGen.Sine(frequency, frequency, alarmingDur/2, channel1, (alarmingDur + pulseDelay)*i + alarmingDur/2);
+
+                waveFormGen.Sine(channel2, (alarmingDur + pulseDelay)*i, alarmingDur, frequency, frequency+25);
+                //waveFormGen.Sine(channel2, (alarmingDur + pulseDelay)*i + alarmingDur/2, alarmingDur/2, frequency, frequency+25);
+                // waveFormGen.Sine(frequency, frequency+25, alarmingDur/2, channel2, (alarmingDur + pulseDelay)*i);
+                // waveFormGen.Sine(frequency, frequency, alarmingDur/2, channel2, (alarmingDur + pulseDelay)*i + alarmingDur/2);
+            }
+        }
+
+        waveFormGen.Encode();
+        streamer = new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat); 
+        streamer.Play();
 
         /*
         var waveFormGen = new FreqSweepWaveformGen(44100, 16);
@@ -336,6 +394,36 @@ public partial class MainWindowViewModel : ViewModelBase
         }
 
         Reset();
+        var waveFormGen = new WaveformGen(44100, 16, 2);
+        for (int i=0; i<pulseCount; i++)
+        {
+            if (sweep1)
+            {
+                waveFormGen.Sine(channel1, (alarmingDur + pulseDelay + rightPhaseOffsets[i])*i, alarmingDur, frequency-25, frequency);
+                waveFormGen.Sine(channel2, (alarmingDur + pulseDelay + leftPhaseOffsets[i])*i, alarmingDur, frequency-25, frequency);
+            }
+            else if (sweep2)
+            {
+                waveFormGen.Sine(channel1, (alarmingDur + pulseDelay + rightPhaseOffsets[i])*i, alarmingDur, frequency+25, frequency);
+                waveFormGen.Sine(channel2, (alarmingDur + pulseDelay + leftPhaseOffsets[i])*i, alarmingDur, frequency+25, frequency);
+            }
+            else if (sweep3)
+            {
+                waveFormGen.Sine(channel1, (alarmingDur + pulseDelay + rightPhaseOffsets[i])*i, alarmingDur, frequency, frequency-25);
+
+                waveFormGen.Sine(channel2, (alarmingDur + pulseDelay + leftPhaseOffsets[i])*i, alarmingDur, frequency, frequency-25);
+            }
+            else
+            {
+                waveFormGen.Sine(channel1, (alarmingDur + pulseDelay + rightPhaseOffsets[i])*i, alarmingDur, frequency, frequency+25);
+
+                waveFormGen.Sine(channel2, (alarmingDur + pulseDelay + leftPhaseOffsets[i])*i, alarmingDur, frequency, frequency+25);
+            }
+        }
+
+        waveFormGen.Encode();
+        streamer = new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat); 
+        streamer.Play();
 
         /*
         var waveFormGen = new FreqSweepWaveformGen(44100, 16);

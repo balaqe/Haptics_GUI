@@ -72,6 +72,12 @@ public class Bakery
         Transitions.Last().Generate();
     }
     
+    public void GenerateLinearTransition(double startTime, double duration, double inStartVal, double inEndVal)
+    {
+        Transitions.Add(new Linear(_format, duration, startTime, inStartVal, inEndVal));
+        Transitions.Last().Generate();
+    }
+    
 
     public void GenerateSine(double startTime, double duration, double startFreq, double endFreq)
     {
@@ -156,6 +162,7 @@ public class Bakery
         {
             // Cannot be higher than rawSamples.Length if incremented by 1
             var index = phaseOffset.Key - 2;
+            var originalIndex = index;
             /*
             0_0 = 0
                 
@@ -167,7 +174,7 @@ public class Bakery
             +0- = 0
             */
             // TODO TEST THIS STUFF
-            bool signChange = false;
+            bool signChange = Math.Sign(BakedSamples[index + 1]) + Math.Sign(BakedSamples[index - 1]) == 0 ? true : false;;
             while (index > 0 && signChange != true)
             {
                 // If opposing signs +1 + (-1) = 0
@@ -176,7 +183,7 @@ public class Bakery
                 index--;
             }
 
-            for (int i = index; i < BakedSamples.Length; i++)
+            for (int i = index; i < originalIndex; i++)
             {
                 BakedSamples[i] = 0;
             }

@@ -35,14 +35,15 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty] public bool sweep3;
     [ObservableProperty] public bool sweep4;
 
-    [ObservableProperty] public bool phase1;
-    [ObservableProperty] public bool phase2;
-    [ObservableProperty] public bool phase3;
-    [ObservableProperty] public bool phase4;
-    [ObservableProperty] public bool phase5;
+    [ObservableProperty] public bool phase1 = true;
+    [ObservableProperty] public bool phase2 = false;
+    [ObservableProperty] public bool phase3 = false;
+    [ObservableProperty] public bool phase4 = false;
+    [ObservableProperty] public bool phase5 = false;
     [ObservableProperty] public double leftPhaseOffset;
     [ObservableProperty] public double rightPhaseOffset;
 
+    [ObservableProperty] public bool alarming = true;
 
     private AudioFileReader audioFile;
     private WasapiOut audioOut;
@@ -90,8 +91,8 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         filePath = string.Empty;
         frequency = 100;
-        alarmingDur = 0.32; // Results in full periods (original: 0.2)
-        refreshingDur = 0.4; // Results in full periods (original: 0.5)
+        alarmingDur = 0.2; // Results in full periods (original: 0.2)
+        refreshingDur = 0.5; // Results in full periods (original: 0.5)
         count1 = true;
         count2 = false;
         count3 = false;
@@ -352,17 +353,40 @@ public partial class MainWindowViewModel : ViewModelBase
         double[] possibleOffsets = new double[3];
         double[] rightPhaseOffsets = new double[pulseCount];
         double[] leftPhaseOffsets = new double[pulseCount];
+        
+        // Random sequence
+        /*
+         * 0. 0
+         * 1. 2
+         * 2. 1
+         * 3. 0
+         * 4. 2
+         * 5. 1
+         * 6. 1
+         * 7. 1
+         * 8. 0
+         * 9. 0
+        */
+        int[] rigthRandSequence = new int[] { 0, 2, 1, 0, 2, 1, 1, 1, 0, 0 };
+        int[] leftRandSequence = new int[] { 2, 1, 2, 1, 0, 2, 0, 0, 2, 1 };
 
         possibleOffsets[0] = 0;
         possibleOffsets[1] = (alarmingDur+pulseDelay)/4;
         possibleOffsets[2] = (alarmingDur+pulseDelay)/2;
 
-        // We don't need a case for phase 1 as it is the default sync case
-        if (phase2)
+        if (phase1)
+        {
+            for (int i = 0; i < pulseCount; i++)
+            {
+                rightPhaseOffsets[i] = 0;
+                leftPhaseOffsets[i] = 0;
+            }
+        }
+        else if (phase2)
         {
             for (int i=0; i<pulseCount; i++)
             {
-                rightPhaseOffsets[i] = (alarmingDur+pulseDelay)/4;
+                rightPhaseOffsets[i] = (alarmingDur+pulseDelay)/8;
                 leftPhaseOffsets[i] = 0;
             }
         }
@@ -370,8 +394,8 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             for (int i=0; i<pulseCount; i++)
             {
-                leftPhaseOffsets[i] = (alarmingDur+pulseDelay)/4;
                 rightPhaseOffsets[i] = 0;
+                leftPhaseOffsets[i] = (alarmingDur+pulseDelay)/4;
             }
         }
         else if (phase4)
@@ -385,11 +409,10 @@ public partial class MainWindowViewModel : ViewModelBase
         else
         {
             Random rnd = new Random();
-
             for (int i=0; i<pulseCount; i++)
             {
-                rightPhaseOffsets[i] = possibleOffsets[rnd.Next(0, 2)];
-                leftPhaseOffsets[i] = possibleOffsets[rnd.Next(0, 2)];
+                rightPhaseOffsets[i] = possibleOffsets[rigthRandSequence[i % 10]];
+                leftPhaseOffsets[i] = possibleOffsets[leftRandSequence[i % 10]];
             }
         }
 
@@ -399,25 +422,23 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             if (sweep1)
             {
-                waveFormGen.Sine(channel1, (alarmingDur + pulseDelay + rightPhaseOffsets[i])*i, alarmingDur, frequency-25, frequency);
-                waveFormGen.Sine(channel2, (alarmingDur + pulseDelay + leftPhaseOffsets[i])*i, alarmingDur, frequency-25, frequency);
+                waveFormGen.Sine(channel1, (alarmingDur + pulseDelay) * i + rightPhaseOffsets[i], alarmingDur, frequency-25, frequency);
+                waveFormGen.Sine(channel2, (alarmingDur + pulseDelay) * i + leftPhaseOffsets[i], alarmingDur, frequency-25, frequency);
             }
             else if (sweep2)
             {
-                waveFormGen.Sine(channel1, (alarmingDur + pulseDelay + rightPhaseOffsets[i])*i, alarmingDur, frequency+25, frequency);
-                waveFormGen.Sine(channel2, (alarmingDur + pulseDelay + leftPhaseOffsets[i])*i, alarmingDur, frequency+25, frequency);
+                waveFormGen.Sine(channel1, (alarmingDur + pulseDelay) * i + rightPhaseOffsets[i], alarmingDur, frequency+25, frequency);
+                waveFormGen.Sine(channel2, (alarmingDur + pulseDelay) * i + leftPhaseOffsets[i], alarmingDur, frequency+25, frequency);
             }
             else if (sweep3)
             {
-                waveFormGen.Sine(channel1, (alarmingDur + pulseDelay + rightPhaseOffsets[i])*i, alarmingDur, frequency, frequency-25);
-
-                waveFormGen.Sine(channel2, (alarmingDur + pulseDelay + leftPhaseOffsets[i])*i, alarmingDur, frequency, frequency-25);
+                waveFormGen.Sine(channel1, (alarmingDur + pulseDelay) * i + rightPhaseOffsets[i], alarmingDur, frequency, frequency-25);
+                waveFormGen.Sine(channel2, (alarmingDur + pulseDelay) * i + leftPhaseOffsets[i], alarmingDur, frequency, frequency-25);
             }
             else
             {
-                waveFormGen.Sine(channel1, (alarmingDur + pulseDelay + rightPhaseOffsets[i])*i, alarmingDur, frequency, frequency+25);
-
-                waveFormGen.Sine(channel2, (alarmingDur + pulseDelay + leftPhaseOffsets[i])*i, alarmingDur, frequency, frequency+25);
+                waveFormGen.Sine(channel1, (alarmingDur + pulseDelay) * i + rightPhaseOffsets[i], alarmingDur, frequency, frequency+25);
+                waveFormGen.Sine(channel2, (alarmingDur + pulseDelay) * i + leftPhaseOffsets[i], alarmingDur, frequency, frequency+25);
             }
         }
 

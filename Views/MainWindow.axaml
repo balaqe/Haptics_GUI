@@ -196,10 +196,10 @@
                                 <StackPanel Grid.Column="0" HorizontalAlignment="Center">
                                     <TextBlock Text="Find Phase Mismatch" FontSize="20" FontWeight="Bold" Margin="5" HorizontalAlignment="Center"/>
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                        <RadioButton Content="Sync" Margin="5" IsChecked="True"/>
-                                        <RadioButton Content="Left lead quarter" Margin="5"/>
-                                        <RadioButton Content="Right lead quarter" Margin="5"/>
-                                        <RadioButton Content="Out of phase" Margin="5"/>
+                                        <RadioButton Content="Sync" Margin="5" IsChecked="{Binding Phase1}"/>
+                                        <RadioButton Content="1/8 offset" Margin="5" IsChecked="{Binding Phase2}"/>
+                                        <RadioButton Content="1/4 offset" Margin="5" IsChecked="{Binding Phase3}"/>
+                                        <RadioButton Content="Out of phase" Margin="5" IsChecked="{Binding Phase4}"/>
                                         <RadioButton Content="Randomize" Margin="5"/>
                                     </StackPanel>
                                     <StackPanel>
@@ -231,6 +231,16 @@
             </TabItem>
 
 
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
 
             <TabItem Header="Refreshing">
                 <StackPanel>
@@ -312,6 +322,35 @@
                                     <ColumnDefinition Width="Auto" />   <!-- Right column for the button -->
                                 </Grid.ColumnDefinitions>
 
+                                <StackPanel Grid.Column="0" HorizontalAlignment="Center">
+                                    <TextBlock Text="Find Pulse Delay" FontSize="20" FontWeight="Bold" Margin="5" HorizontalAlignment="Center"/>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                        <RadioButton Content="0.2" Margin="5" IsChecked="{Binding PulseDelay1}"/>
+                                        <RadioButton Content="0.3" Margin="5" IsChecked="{Binding PulseDelay2}"/>
+                                        <RadioButton Content="0.1" Margin="5" IsChecked="{Binding PulseDelay3}"/>
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <Button Grid.Column="1"
+                                        Content="PLAY"
+                                        Width="100"
+                                        Height="50"
+                                        HorizontalContentAlignment="Center"
+                                        VerticalContentAlignment="Center"
+                                        Margin="10"
+                                        VerticalAlignment="Center"
+                                        Command="{Binding FindPulseDelay}"
+                                        />
+                            </Grid>
+                        </Border>
+
+                        <Border Margin="5" BorderBrush="Black" BorderThickness="1" CornerRadius="7">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />      <!-- Center column -->
+                                    <ColumnDefinition Width="Auto" />   <!-- Right column for the button -->
+                                </Grid.ColumnDefinitions>
+
                                 <StackPanel HorizontalAlignment="Center">
                                     <TextBlock Text="Find Sweep" FontSize="20" FontWeight="Bold" Margin="5" HorizontalAlignment="Center"/>
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
@@ -376,10 +415,10 @@
                                 <StackPanel Grid.Column="0" HorizontalAlignment="Center">
                                     <TextBlock Text="Find Phase Mismatch" FontSize="20" FontWeight="Bold" Margin="5" HorizontalAlignment="Center"/>
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                        <RadioButton Content="Sync" Margin="5" IsChecked="True"/>
-                                        <RadioButton Content="Left lead quarter" Margin="5"/>
-                                        <RadioButton Content="Right lead quarter" Margin="5"/>
-                                        <RadioButton Content="Out of phase" Margin="5"/>
+                                        <RadioButton Content="Sync" Margin="5" IsChecked="{Binding Phase1}"/>
+                                        <RadioButton Content="1/8 offset" Margin="5" IsChecked="{Binding Phase2}"/>
+                                        <RadioButton Content="1/4 offset" Margin="5" IsChecked="{Binding Phase3}"/>
+                                        <RadioButton Content="Out of phase" Margin="5" IsChecked="{Binding Phase4}"/>
                                         <RadioButton Content="Randomize" Margin="5"/>
                                     </StackPanel>
                                     <StackPanel>
@@ -398,7 +437,9 @@
                                         HorizontalContentAlignment="Center"
                                         VerticalContentAlignment="Center"
                                         Margin="10"
-                                        VerticalAlignment="Center"/>
+                                        VerticalAlignment="Center"
+                                        Command="{Binding FindPhase}"
+                                        />
                             </Grid>
                         </Border>
                         

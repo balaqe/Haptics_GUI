@@ -97,7 +97,7 @@ public class Bakery
         sine.Generate();
         
         // Padding until end
-        PadSamples((int)((startTime + duration) * _format.SamplingRate));
+        PadSamples((int)((startTime + duration) * _format.SamplingRate) + 1);
         
         PhaseOffsets.Add(new PhaseOffset(sine.endPhase, (int)((startTime + duration) * _format.SamplingRate)));
 
@@ -124,7 +124,7 @@ public class Bakery
         square.Generate();
 
         // Padding until end
-        PadSamples((int)((startTime + duration) * _format.SamplingRate));
+        PadSamples((int)((startTime + duration) * _format.SamplingRate) + 1); // due to a roudning error +1 is necessary, consider keeping the time uint uniform, in samples bc everything is discrete
 
         PhaseOffsets.Add(new PhaseOffset(square.endPhase, (int)((startTime + duration) * _format.SamplingRate)));
 

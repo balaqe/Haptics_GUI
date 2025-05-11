@@ -183,7 +183,7 @@ public class Bakery
                 index--;
             }
 
-            for (int i = index; i < originalIndex; i++)
+            for (int i = index; i <= originalIndex; i++)
             {
                 BakedSamples[i] = 0;
             }

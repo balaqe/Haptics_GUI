@@ -146,22 +146,26 @@ public partial class MainWindowViewModel : ViewModelBase
 
         Reset();
 
-        //var foo = new WaveformGen(44100, 16, 2);
         var waveFormGen = new WaveformGen(44100, 16, 2);
 
         frequency = 100;
 
         for (int i=0; i<pulseCount; i++)
         {
-            /*
-            foo.Sine(0, 0, 1, 100, 100);
-            foo.Linear(0, 0, 1, 1, 0);
-            foo.Sine(1, 1, 1, 200, 300);
-            foo.Linear(1, 1, 1, 0.5, 1);
-            //foo.Encode();
-            */
-            waveFormGen.Sine(channel1, (alarmingDur + pulseDelay)*i, alarmingDur, frequency, frequency);
-            waveFormGen.Sine(channel2, (alarmingDur + pulseDelay)*i, alarmingDur, frequency, frequency);
+            if (alarming)
+            {
+                waveFormGen.Square(channel1, (alarmingDur + pulseDelay)*i, alarmingDur, frequency, frequency);
+                waveFormGen.Square(channel2, (alarmingDur + pulseDelay)*i, alarmingDur, frequency, frequency);
+            }
+            else if (refreshing)
+            {
+                waveFormGen.Sine(channel1, (refreshingDur + pulseDelay)*i, refreshingDur, frequency, frequency);
+                waveFormGen.Sine(channel2, (refreshingDur + pulseDelay)*i, refreshingDur, frequency, frequency);
+            }
+            else
+            {
+                Console.WriteLine("Dumbass...");
+            }
         }
         waveFormGen.Encode();
 
@@ -195,8 +199,20 @@ public partial class MainWindowViewModel : ViewModelBase
         var waveFormGen = new WaveformGen(44100, 16, 2);
         for (int i=0; i<pulseCount; i++)
         {
-            waveFormGen.Sine(channel1, (alarmingDur + pulseDelay)*i, alarmingDur, frequency, frequency);
-            waveFormGen.Sine(channel2, (alarmingDur + pulseDelay)*i, alarmingDur, frequency, frequency);
+            if (alarming)
+            {
+                waveFormGen.Square(channel1, (alarmingDur + pulseDelay)*i, alarmingDur, frequency, frequency);
+                waveFormGen.Square(channel2, (alarmingDur + pulseDelay)*i, alarmingDur, frequency, frequency);
+            }
+            else if (refreshing)
+            {
+                waveFormGen.Sine(channel1, (refreshingDur + pulseDelay)*i, refreshingDur, frequency, frequency);
+                waveFormGen.Sine(channel2, (refreshingDur + pulseDelay)*i, refreshingDur, frequency, frequency);
+            }
+            else
+            {
+                Console.WriteLine("Dumbass...");
+            }
         }
 
         waveFormGen.Encode();
@@ -239,8 +255,20 @@ public partial class MainWindowViewModel : ViewModelBase
         var waveFormGen = new WaveformGen(44100, 16, 2);
         for (int i=0; i<pulseCount; i++)
         {
-            waveFormGen.Sine(channel1, (alarmingDur + pulseDelay)*i, alarmingDur, frequency, frequency);
-            waveFormGen.Sine(channel2, (alarmingDur + pulseDelay)*i, alarmingDur, frequency, frequency);
+            if (alarming)
+            {
+                waveFormGen.Square(channel1, (alarmingDur + pulseDelay)*i, alarmingDur, frequency, frequency);
+                waveFormGen.Square(channel2, (alarmingDur + pulseDelay)*i, alarmingDur, frequency, frequency);
+            }
+            else if (refreshing)
+            {
+                waveFormGen.Sine(channel1, (refreshingDur + pulseDelay)*i, refreshingDur, frequency, frequency);
+                waveFormGen.Sine(channel2, (refreshingDur + pulseDelay)*i, refreshingDur, frequency, frequency);
+            }
+            else
+            {
+                Console.WriteLine("Dumbass...");
+            }
         }
 
         waveFormGen.Encode();
@@ -269,84 +297,77 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             if (sweep1)
             {
-                waveFormGen.Sine(channel1, (alarmingDur + pulseDelay)*i, alarmingDur, frequency-25, frequency);
-                waveFormGen.Sine(channel2, (alarmingDur + pulseDelay)*i, alarmingDur, frequency-25, frequency);
-            }
-            else if (sweep2)
+            if (alarming)
             {
-                waveFormGen.Sine(channel1, (alarmingDur + pulseDelay)*i, alarmingDur, frequency+25, frequency);
-                waveFormGen.Sine(channel2, (alarmingDur + pulseDelay)*i, alarmingDur, frequency+25, frequency);
+                waveFormGen.Square(channel1, (alarmingDur + pulseDelay)*i, alarmingDur, frequency-25, frequency);
+                waveFormGen.Square(channel2, (alarmingDur + pulseDelay)*i, alarmingDur, frequency-25, frequency);
             }
-            else if (sweep3)
+            else if (refreshing)
             {
-                waveFormGen.Sine(channel1, (alarmingDur + pulseDelay)*i, alarmingDur, frequency, frequency-25);
-                //waveFormGen.Sine(channel1, (alarmingDur + pulseDelay)*i + alarmingDur/2, alarmingDur/2, frequency, frequency-25);
-                // waveFormGen.Sine(frequency, frequency-25, alarmingDur/2, channel1, (alarmingDur + pulseDelay)*i);
-                // waveFormGen.Sine(frequency, frequency, alarmingDur/2, channel1, (alarmingDur + pulseDelay)*i + alarmingDur/2);
-
-                waveFormGen.Sine(channel2, (alarmingDur + pulseDelay)*i, alarmingDur, frequency, frequency-25);
-                //waveFormGen.Sine(channel2, (alarmingDur + pulseDelay)*i + alarmingDur/2, alarmingDur/2, frequency, frequency-25);
-                // waveFormGen.Sine(frequency, frequency-25, alarmingDur/2, channel2, (alarmingDur + pulseDelay)*i);
-                // waveFormGen.Sine(frequency, frequency, alarmingDur/2, channel2, (alarmingDur + pulseDelay)*i + alarmingDur/2);
+                waveFormGen.Sine(channel1, (refreshingDur + pulseDelay)*i, refreshingDur, frequency-25, frequency);
+                waveFormGen.Sine(channel2, (refreshingDur + pulseDelay)*i, refreshingDur, frequency-25, frequency);
             }
             else
             {
-                waveFormGen.Sine(channel1, (alarmingDur + pulseDelay)*i, alarmingDur, frequency, frequency+25);
-                //waveFormGen.Sine(channel1, (alarmingDur + pulseDelay)*i + alarmingDur/2, alarmingDur/2, frequency, frequency+25);
-                // waveFormGen.Sine(frequency, frequency+25, alarmingDur/2, channel1, (alarmingDur + pulseDelay)*i);
-                // waveFormGen.Sine(frequency, frequency, alarmingDur/2, channel1, (alarmingDur + pulseDelay)*i + alarmingDur/2);
-
-                waveFormGen.Sine(channel2, (alarmingDur + pulseDelay)*i, alarmingDur, frequency, frequency+25);
-                //waveFormGen.Sine(channel2, (alarmingDur + pulseDelay)*i + alarmingDur/2, alarmingDur/2, frequency, frequency+25);
-                // waveFormGen.Sine(frequency, frequency+25, alarmingDur/2, channel2, (alarmingDur + pulseDelay)*i);
-                // waveFormGen.Sine(frequency, frequency, alarmingDur/2, channel2, (alarmingDur + pulseDelay)*i + alarmingDur/2);
+                Console.WriteLine("Dumbass...");
+            }
+            }
+            else if (sweep2)
+            {
+            if (alarming)
+            {
+                waveFormGen.Square(channel1, (alarmingDur + pulseDelay)*i, alarmingDur, frequency+25, frequency);
+                waveFormGen.Square(channel2, (alarmingDur + pulseDelay)*i, alarmingDur, frequency+25, frequency);
+            }
+            else if (refreshing)
+            {
+                waveFormGen.Sine(channel1, (refreshingDur + pulseDelay)*i, refreshingDur, frequency+25, frequency);
+                waveFormGen.Sine(channel2, (refreshingDur + pulseDelay)*i, refreshingDur, frequency+25, frequency);
+            }
+            else
+            {
+                Console.WriteLine("Dumbass...");
+            }
+            }
+            else if (sweep3)
+            {
+            if (alarming)
+            {
+                waveFormGen.Square(channel1, (alarmingDur + pulseDelay)*i, alarmingDur, frequency, frequency-25);
+                waveFormGen.Square(channel2, (alarmingDur + pulseDelay)*i, alarmingDur, frequency, frequency-25);
+            }
+            else if (refreshing)
+            {
+                waveFormGen.Sine(channel1, (refreshingDur + pulseDelay)*i, refreshingDur, frequency, frequency-25);
+                waveFormGen.Sine(channel2, (refreshingDur + pulseDelay)*i, refreshingDur, frequency, frequency-25);
+            }
+            else
+            {
+                Console.WriteLine("Dumbass...");
+            }
+            }
+            else
+            {
+            if (alarming)
+            {
+                waveFormGen.Square(channel1, (alarmingDur + pulseDelay)*i, alarmingDur, frequency, frequency+25);
+                waveFormGen.Square(channel2, (alarmingDur + pulseDelay)*i, alarmingDur, frequency, frequency+25);
+            }
+            else if (refreshing)
+            {
+                waveFormGen.Sine(channel1, (refreshingDur + pulseDelay)*i, refreshingDur, frequency, frequency+25);
+                waveFormGen.Sine(channel2, (refreshingDur + pulseDelay)*i, refreshingDur, frequency, frequency+25);
+            }
+            else
+            {
+                Console.WriteLine("Dumbass...");
+            }
             }
         }
 
         waveFormGen.Encode();
         streamer = new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat); 
         streamer.Play();
-
-        /*
-        var waveFormGen = new FreqSweepWaveformGen(44100, 16);
-        for (int i=0; i<pulseCount; i++)
-        {
-            if (sweep1)
-            {
-                waveFormGen.Sine(frequency-25, frequency, alarmingDur, channel1, (alarmingDur + pulseDelay)*i);
-                // waveFormGen.Sine(frequency, frequency, alarmingDur/2, channel1, (alarmingDur + pulseDelay)*i + alarmingDur/2);
-
-                waveFormGen.Sine(frequency-25, frequency, alarmingDur, channel2, (alarmingDur + pulseDelay)*i);
-                // waveFormGen.Sine(frequency, frequency, alarmingDur/2, channel2, (alarmingDur + pulseDelay)*i + alarmingDur/2);
-            }
-            else if (sweep2)
-            {
-                waveFormGen.Sine(frequency+25, frequency, alarmingDur, channel1, (alarmingDur + pulseDelay)*i);
-                // waveFormGen.Sine(frequency, frequency, alarmingDur/2, channel1, (alarmingDur + pulseDelay)*i + alarmingDur/2);
-
-                waveFormGen.Sine(frequency+25, frequency, alarmingDur, channel2, (alarmingDur + pulseDelay)*i);
-                // waveFormGen.Sine(frequency, frequency, alarmingDur/2, channel2, (alarmingDur + pulseDelay)*i + alarmingDur/2);
-            }
-            else if (sweep3)
-            {
-                // waveFormGen.Sine(frequency, frequency-25, alarmingDur/2, channel1, (alarmingDur + pulseDelay)*i);
-                // waveFormGen.Sine(frequency, frequency, alarmingDur/2, channel1, (alarmingDur + pulseDelay)*i + alarmingDur/2);
-
-                // waveFormGen.Sine(frequency, frequency-25, alarmingDur/2, channel2, (alarmingDur + pulseDelay)*i);
-                // waveFormGen.Sine(frequency, frequency, alarmingDur/2, channel2, (alarmingDur + pulseDelay)*i + alarmingDur/2);
-            }
-            else
-            {
-                // waveFormGen.Sine(frequency, frequency+25, alarmingDur/2, channel1, (alarmingDur + pulseDelay)*i);
-                // waveFormGen.Sine(frequency, frequency, alarmingDur/2, channel1, (alarmingDur + pulseDelay)*i + alarmingDur/2);
-
-                // waveFormGen.Sine(frequency, frequency+25, alarmingDur/2, channel2, (alarmingDur + pulseDelay)*i);
-                // waveFormGen.Sine(frequency, frequency, alarmingDur/2, channel2, (alarmingDur + pulseDelay)*i + alarmingDur/2);
-            }
-        }
-        streamer = new ByteStream(waveFormGen.ByteStreams, waveFormGen.WaveFormat); 
-        streamer.Play();
-        */
     }
 
     [RelayCommand]
@@ -424,70 +445,77 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             if (sweep1)
             {
-                waveFormGen.Sine(channel1, (alarmingDur + pulseDelay) * i + rightPhaseOffsets[i], alarmingDur, frequency-25, frequency);
-                waveFormGen.Sine(channel2, (alarmingDur + pulseDelay) * i + leftPhaseOffsets[i], alarmingDur, frequency-25, frequency);
-            }
-            else if (sweep2)
+            if (alarming)
             {
-                waveFormGen.Sine(channel1, (alarmingDur + pulseDelay) * i + rightPhaseOffsets[i], alarmingDur, frequency+25, frequency);
-                waveFormGen.Sine(channel2, (alarmingDur + pulseDelay) * i + leftPhaseOffsets[i], alarmingDur, frequency+25, frequency);
+                waveFormGen.Square(channel1, (alarmingDur + pulseDelay) * i + rightPhaseOffsets[i], alarmingDur, frequency-25, frequency);
+                waveFormGen.Square(channel2, (alarmingDur + pulseDelay) * i + leftPhaseOffsets[i], alarmingDur, frequency-25, frequency);
             }
-            else if (sweep3)
+            else if (refreshing)
             {
-                waveFormGen.Sine(channel1, (alarmingDur + pulseDelay) * i + rightPhaseOffsets[i], alarmingDur, frequency, frequency-25);
-                waveFormGen.Sine(channel2, (alarmingDur + pulseDelay) * i + leftPhaseOffsets[i], alarmingDur, frequency, frequency-25);
+                waveFormGen.Sine(channel1, (refreshingDur + pulseDelay) * i + rightPhaseOffsets[i], refreshingDur, frequency-25, frequency);
+                waveFormGen.Sine(channel2, (refreshingDur + pulseDelay) * i + leftPhaseOffsets[i], refreshingDur, frequency-25, frequency);
             }
             else
             {
-                waveFormGen.Sine(channel1, (alarmingDur + pulseDelay) * i + rightPhaseOffsets[i], alarmingDur, frequency, frequency+25);
-                waveFormGen.Sine(channel2, (alarmingDur + pulseDelay) * i + leftPhaseOffsets[i], alarmingDur, frequency, frequency+25);
+                Console.WriteLine("Dumbass...");
+            }
+            }
+            else if (sweep2)
+            {
+            if (alarming)
+            {
+                waveFormGen.Square(channel1, (alarmingDur + pulseDelay) * i + rightPhaseOffsets[i], alarmingDur, frequency+25, frequency);
+                waveFormGen.Square(channel2, (alarmingDur + pulseDelay) * i + leftPhaseOffsets[i], alarmingDur, frequency+25, frequency);
+            }
+            else if (refreshing)
+            {
+                waveFormGen.Sine(channel1, (refreshingDur + pulseDelay) * i + rightPhaseOffsets[i], refreshingDur, frequency+25, frequency);
+                waveFormGen.Sine(channel2, (refreshingDur + pulseDelay) * i + leftPhaseOffsets[i], refreshingDur, frequency+25, frequency);
+            }
+            else
+            {
+                Console.WriteLine("Dumbass...");
+            }
+            }
+            else if (sweep3)
+            {
+            if (alarming)
+            {
+                waveFormGen.Square(channel1, (alarmingDur + pulseDelay) * i + rightPhaseOffsets[i], alarmingDur, frequency, frequency-25);
+                waveFormGen.Square(channel2, (alarmingDur + pulseDelay) * i + leftPhaseOffsets[i], alarmingDur, frequency, frequency-25);
+            }
+            else if (refreshing)
+            {
+                waveFormGen.Sine(channel1, (refreshingDur + pulseDelay) * i + rightPhaseOffsets[i], refreshingDur, frequency, frequency-25);
+                waveFormGen.Sine(channel2, (refreshingDur + pulseDelay) * i + leftPhaseOffsets[i], refreshingDur, frequency, frequency-25);
+            }
+            else
+            {
+                Console.WriteLine("Dumbass...");
+            }
+            }
+            else
+            {
+            if (alarming)
+            {
+                waveFormGen.Square(channel1, (alarmingDur + pulseDelay) * i + rightPhaseOffsets[i], alarmingDur, frequency, frequency+25);
+                waveFormGen.Square(channel2, (alarmingDur + pulseDelay) * i + leftPhaseOffsets[i], alarmingDur, frequency, frequency+25);
+            }
+            else if (refreshing)
+            {
+                waveFormGen.Sine(channel1, (refreshingDur + pulseDelay) * i + rightPhaseOffsets[i], refreshingDur, frequency, frequency+25);
+                waveFormGen.Sine(channel2, (refreshingDur + pulseDelay) * i + leftPhaseOffsets[i], refreshingDur, frequency, frequency+25);
+            }
+            else
+            {
+                Console.WriteLine("Dumbass...");
+            }
             }
         }
 
         waveFormGen.Encode();
         streamer = new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat); 
         streamer.Play();
-
-        /*
-        var waveFormGen = new FreqSweepWaveformGen(44100, 16);
-        for (int i=0; i<pulseCount; i++)
-        {
-            if (sweep1)
-            {
-                waveFormGen.Sine(frequency-25, frequency, alarmingDur, channel1, (alarmingDur + pulseDelay + rightPhaseOffsets[i])*i);
-                // waveFormGen.Sine(frequency, frequency, alarmingDur/2, channel1, (alarmingDur + pulseDelay)*i + alarmingDur/2);
-
-                waveFormGen.Sine(frequency-25, frequency, alarmingDur, channel2, (alarmingDur + pulseDelay + leftPhaseOffsets[i])*i);
-                // waveFormGen.Sine(frequency, frequency, alarmingDur/2, channel2, (alarmingDur + pulseDelay)*i + alarmingDur/2);
-            }
-            else if (sweep2)
-            {
-                waveFormGen.Sine(frequency+25, frequency, alarmingDur, channel1, (alarmingDur + pulseDelay + rightPhaseOffsets[i])*i);
-                // waveFormGen.Sine(frequency, frequency, alarmingDur/2, channel1, (alarmingDur + pulseDelay)*i + alarmingDur/2);
-
-                waveFormGen.Sine(frequency+25, frequency, alarmingDur, channel2, (alarmingDur + pulseDelay + leftPhaseOffsets[i])*i);
-                // waveFormGen.Sine(frequency, frequency, alarmingDur/2, channel2, (alarmingDur + pulseDelay)*i + alarmingDur/2);
-            }
-            else if (sweep3)
-            {
-                // waveFormGen.Sine(frequency, frequency, alarmingDur/2, channel1, (alarmingDur + pulseDelay)*i);
-                // waveFormGen.Sine(frequency, frequency-25, alarmingDur/2, channel1, (alarmingDur + pulseDelay)*i + alarmingDur/2);
-
-                // waveFormGen.Sine(frequency, frequency-25, alarmingDur/2, channel2, (alarmingDur + pulseDelay)*i);
-                // waveFormGen.Sine(frequency, frequency, alarmingDur/2, channel2, (alarmingDur + pulseDelay)*i + alarmingDur/2);
-            }
-            else
-            {
-                // waveFormGen.Sine(frequency, frequency+25, alarmingDur/2, channel1, (alarmingDur + pulseDelay)*i);
-                // waveFormGen.Sine(frequency, frequency, alarmingDur/2, channel1, (alarmingDur + pulseDelay)*i + alarmingDur/2);
-
-                // waveFormGen.Sine(frequency, frequency+25, alarmingDur/2, channel2, (alarmingDur + pulseDelay)*i);
-                // waveFormGen.Sine(frequency, frequency, alarmingDur/2, channel2, (alarmingDur + pulseDelay)*i + alarmingDur/2);
-            }
-        }
-        streamer = new ByteStream(waveFormGen.ByteStreams, waveFormGen.WaveFormat); 
-        streamer.Play();
-        */
     }
     
     private void Reset()

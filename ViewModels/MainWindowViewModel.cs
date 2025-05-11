@@ -43,7 +43,9 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty] public double leftPhaseOffset;
     [ObservableProperty] public double rightPhaseOffset;
 
-    [ObservableProperty] public bool alarming = true;
+
+    [ObservableProperty] public bool refreshing = true;
+    [ObservableProperty] public bool alarming = false;
 
     private AudioFileReader audioFile;
     private WasapiOut audioOut;

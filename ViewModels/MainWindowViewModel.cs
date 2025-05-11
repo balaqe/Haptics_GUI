@@ -161,6 +161,12 @@ public partial class MainWindowViewModel : ViewModelBase
             {
                 waveFormGen.Sine(channel1, (refreshingDur + pulseDelay)*i, refreshingDur, frequency, frequency);
                 waveFormGen.Sine(channel2, (refreshingDur + pulseDelay)*i, refreshingDur, frequency, frequency);
+                
+                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay)*i, refreshingDur/2, 0, 1);
+                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay)*i + refreshingDur/2, refreshingDur/2, 1, 0);
+                
+                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay)*i, refreshingDur/2, 0, 1);
+                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay)*i + refreshingDur/2, refreshingDur/2, 1, 0);
             }
             else
             {
@@ -208,6 +214,12 @@ public partial class MainWindowViewModel : ViewModelBase
             {
                 waveFormGen.Sine(channel1, (refreshingDur + pulseDelay)*i, refreshingDur, frequency, frequency);
                 waveFormGen.Sine(channel2, (refreshingDur + pulseDelay)*i, refreshingDur, frequency, frequency);
+                
+                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay)*i, refreshingDur/2, 0, 1);
+                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay)*i + refreshingDur/2, refreshingDur/2, 1, 0);
+                
+                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay)*i, refreshingDur/2, 0, 1);
+                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay)*i + refreshingDur/2, refreshingDur/2, 1, 0);
             }
             else
             {
@@ -264,6 +276,12 @@ public partial class MainWindowViewModel : ViewModelBase
             {
                 waveFormGen.Sine(channel1, (refreshingDur + pulseDelay)*i, refreshingDur, frequency, frequency);
                 waveFormGen.Sine(channel2, (refreshingDur + pulseDelay)*i, refreshingDur, frequency, frequency);
+                
+                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay)*i, refreshingDur/2, 0, 1);
+                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay)*i + refreshingDur/2, refreshingDur/2, 1, 0);
+                
+                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay)*i, refreshingDur/2, 0, 1);
+                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay)*i + refreshingDur/2, refreshingDur/2, 1, 0);
             }
             else
             {
@@ -306,6 +324,13 @@ public partial class MainWindowViewModel : ViewModelBase
             {
                 waveFormGen.Sine(channel1, (refreshingDur + pulseDelay)*i, refreshingDur, frequency-25, frequency);
                 waveFormGen.Sine(channel2, (refreshingDur + pulseDelay)*i, refreshingDur, frequency-25, frequency);
+                
+                
+                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay)*i, refreshingDur/2, 0, 1);
+                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay)*i + refreshingDur/2, refreshingDur/2, 1, 0);
+                
+                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay)*i, refreshingDur/2, 0, 1);
+                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay)*i + refreshingDur/2, refreshingDur/2, 1, 0);
             }
             else
             {
@@ -323,6 +348,12 @@ public partial class MainWindowViewModel : ViewModelBase
             {
                 waveFormGen.Sine(channel1, (refreshingDur + pulseDelay)*i, refreshingDur, frequency+25, frequency);
                 waveFormGen.Sine(channel2, (refreshingDur + pulseDelay)*i, refreshingDur, frequency+25, frequency);
+                
+                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay)*i, refreshingDur/2, 0, 1);
+                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay)*i + refreshingDur/2, refreshingDur/2, 1, 0);
+                
+                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay)*i, refreshingDur/2, 0, 1);
+                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay)*i + refreshingDur/2, refreshingDur/2, 1, 0);
             }
             else
             {
@@ -340,6 +371,12 @@ public partial class MainWindowViewModel : ViewModelBase
             {
                 waveFormGen.Sine(channel1, (refreshingDur + pulseDelay)*i, refreshingDur, frequency, frequency-25);
                 waveFormGen.Sine(channel2, (refreshingDur + pulseDelay)*i, refreshingDur, frequency, frequency-25);
+                
+                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay)*i, refreshingDur/2, 0, 1);
+                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay)*i + refreshingDur/2, refreshingDur/2, 1, 0);
+                
+                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay)*i, refreshingDur/2, 0, 1);
+                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay)*i + refreshingDur/2, refreshingDur/2, 1, 0);
             }
             else
             {
@@ -357,6 +394,12 @@ public partial class MainWindowViewModel : ViewModelBase
             {
                 waveFormGen.Sine(channel1, (refreshingDur + pulseDelay)*i, refreshingDur, frequency, frequency+25);
                 waveFormGen.Sine(channel2, (refreshingDur + pulseDelay)*i, refreshingDur, frequency, frequency+25);
+                
+                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay)*i, refreshingDur/2, 0, 1);
+                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay)*i + refreshingDur/2, refreshingDur/2, 1, 0);
+                
+                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay)*i, refreshingDur/2, 0, 1);
+                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay)*i + refreshingDur/2, refreshingDur/2, 1, 0);
             }
             else
             {
@@ -454,6 +497,12 @@ public partial class MainWindowViewModel : ViewModelBase
             {
                 waveFormGen.Sine(channel1, (refreshingDur + pulseDelay) * i + rightPhaseOffsets[i], refreshingDur, frequency-25, frequency);
                 waveFormGen.Sine(channel2, (refreshingDur + pulseDelay) * i + leftPhaseOffsets[i], refreshingDur, frequency-25, frequency);
+                
+                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay) * i + rightPhaseOffsets[i], refreshingDur/2, 0, 1);
+                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay) * i + rightPhaseOffsets[i] + refreshingDur/2, refreshingDur/2, 1, 0);
+                
+                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay) * i + leftPhaseOffsets[i], refreshingDur/2, 0, 1);
+                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay) * i + leftPhaseOffsets[i] + refreshingDur/2, refreshingDur/2, 1, 0);
             }
             else
             {
@@ -471,6 +520,12 @@ public partial class MainWindowViewModel : ViewModelBase
             {
                 waveFormGen.Sine(channel1, (refreshingDur + pulseDelay) * i + rightPhaseOffsets[i], refreshingDur, frequency+25, frequency);
                 waveFormGen.Sine(channel2, (refreshingDur + pulseDelay) * i + leftPhaseOffsets[i], refreshingDur, frequency+25, frequency);
+                
+                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay) * i + rightPhaseOffsets[i], refreshingDur/2, 0, 1);
+                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay) * i + rightPhaseOffsets[i] + refreshingDur/2, refreshingDur/2, 1, 0);
+                
+                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay) * i + leftPhaseOffsets[i], refreshingDur/2, 0, 1);
+                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay) * i + leftPhaseOffsets[i] + refreshingDur/2, refreshingDur/2, 1, 0);
             }
             else
             {
@@ -488,6 +543,12 @@ public partial class MainWindowViewModel : ViewModelBase
             {
                 waveFormGen.Sine(channel1, (refreshingDur + pulseDelay) * i + rightPhaseOffsets[i], refreshingDur, frequency, frequency-25);
                 waveFormGen.Sine(channel2, (refreshingDur + pulseDelay) * i + leftPhaseOffsets[i], refreshingDur, frequency, frequency-25);
+                
+                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay) * i + rightPhaseOffsets[i], refreshingDur/2, 0, 1);
+                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay) * i + rightPhaseOffsets[i] + refreshingDur/2, refreshingDur/2, 1, 0);
+                
+                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay) * i + leftPhaseOffsets[i], refreshingDur/2, 0, 1);
+                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay) * i + leftPhaseOffsets[i] + refreshingDur/2, refreshingDur/2, 1, 0);
             }
             else
             {
@@ -505,6 +566,12 @@ public partial class MainWindowViewModel : ViewModelBase
             {
                 waveFormGen.Sine(channel1, (refreshingDur + pulseDelay) * i + rightPhaseOffsets[i], refreshingDur, frequency, frequency+25);
                 waveFormGen.Sine(channel2, (refreshingDur + pulseDelay) * i + leftPhaseOffsets[i], refreshingDur, frequency, frequency+25);
+                
+                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay) * i + rightPhaseOffsets[i], refreshingDur/2, 0, 1);
+                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay) * i + rightPhaseOffsets[i] + refreshingDur/2, refreshingDur/2, 1, 0);
+                
+                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay) * i + leftPhaseOffsets[i], refreshingDur/2, 0, 1);
+                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay) * i + leftPhaseOffsets[i] + refreshingDur/2, refreshingDur/2, 1, 0);
             }
             else
             {

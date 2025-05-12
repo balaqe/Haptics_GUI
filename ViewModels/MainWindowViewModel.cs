@@ -51,13 +51,13 @@ public partial class MainWindowViewModel : ViewModelBase
     private WasapiOut audioOut;
 
     private ByteStream? byteStream;
-    
+
     // private IDictionary<string, ByteStream> FunctionDictionary;
     private ByteStream streamer;
 
     private double refreshingDur;
     private double alarmingDur;
-    
+
 
     [RelayCommand]
     public void PlayGenFile()
@@ -76,9 +76,9 @@ public partial class MainWindowViewModel : ViewModelBase
     public void PlayFile()
     {
         audioFile = new AudioFileReader(filePath);
-        
+
         audioOut = new WasapiOut(AudioClientShareMode.Exclusive, false, 100);
-        
+
         audioOut.Init(audioFile);
         audioOut.Play();
     }
@@ -89,6 +89,7 @@ public partial class MainWindowViewModel : ViewModelBase
         audioOut.Stop();
         audioOut.Dispose();
     }
+
     public MainWindowViewModel()
     {
         filePath = string.Empty;
@@ -107,13 +108,11 @@ public partial class MainWindowViewModel : ViewModelBase
         // fastSmooth = 0.1;
         // slowSmooth = 0.25;
         // squareAmp = 0.81;
-        
+
         // FunctionDictionary = new Dictionary<string, ByteStream>();
-
-
     }
-    
-    
+
+
     // Survey 1
     [RelayCommand]
     public void SineStepPlay()
@@ -150,32 +149,35 @@ public partial class MainWindowViewModel : ViewModelBase
 
         frequency = 100;
 
-        for (int i=0; i<pulseCount; i++)
+        for (int i = 0; i < pulseCount; i++)
         {
             if (alarming)
             {
-                waveFormGen.Square(channel1, (alarmingDur + pulseDelay)*i, alarmingDur, frequency, frequency);
-                waveFormGen.Square(channel2, (alarmingDur + pulseDelay)*i, alarmingDur, frequency, frequency);
+                waveFormGen.Square(channel1, (alarmingDur + pulseDelay) * i, alarmingDur, frequency, frequency);
+                waveFormGen.Square(channel2, (alarmingDur + pulseDelay) * i, alarmingDur, frequency, frequency);
             }
             else if (refreshing)
             {
-                waveFormGen.Sine(channel1, (refreshingDur + pulseDelay)*i, refreshingDur, frequency, frequency);
-                waveFormGen.Sine(channel2, (refreshingDur + pulseDelay)*i, refreshingDur, frequency, frequency);
-                
-                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay)*i, refreshingDur/2, 0, 1);
-                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay)*i + refreshingDur/2, refreshingDur/2, 1, 0);
-                
-                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay)*i, refreshingDur/2, 0, 1);
-                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay)*i + refreshingDur/2, refreshingDur/2, 1, 0);
+                waveFormGen.Sine(channel1, (refreshingDur + pulseDelay) * i, refreshingDur, frequency, frequency);
+                waveFormGen.Sine(channel2, (refreshingDur + pulseDelay) * i, refreshingDur, frequency, frequency);
+
+                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay) * i, refreshingDur / 2, 0, 1);
+                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay) * i + refreshingDur / 2, refreshingDur / 2, 1,
+                    0);
+
+                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay) * i, refreshingDur / 2, 0, 1);
+                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay) * i + refreshingDur / 2, refreshingDur / 2, 1,
+                    0);
             }
             else
             {
                 Console.WriteLine("Dumbass...");
             }
         }
+
         waveFormGen.Encode();
 
-        streamer = new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat); 
+        streamer = new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat);
         streamer.Play();
     }
 
@@ -201,25 +203,27 @@ public partial class MainWindowViewModel : ViewModelBase
         // Console.WriteLine("Freq: " + frequency);
 
         Reset();
-        
+
         var waveFormGen = new WaveformGen(44100, 16, 2);
-        for (int i=0; i<pulseCount; i++)
+        for (int i = 0; i < pulseCount; i++)
         {
             if (alarming)
             {
-                waveFormGen.Square(channel1, (alarmingDur + pulseDelay)*i, alarmingDur, frequency, frequency);
-                waveFormGen.Square(channel2, (alarmingDur + pulseDelay)*i, alarmingDur, frequency, frequency);
+                waveFormGen.Square(channel1, (alarmingDur + pulseDelay) * i, alarmingDur, frequency, frequency);
+                waveFormGen.Square(channel2, (alarmingDur + pulseDelay) * i, alarmingDur, frequency, frequency);
             }
             else if (refreshing)
             {
-                waveFormGen.Sine(channel1, (refreshingDur + pulseDelay)*i, refreshingDur, frequency, frequency);
-                waveFormGen.Sine(channel2, (refreshingDur + pulseDelay)*i, refreshingDur, frequency, frequency);
-                
-                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay)*i, refreshingDur/2, 0, 1);
-                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay)*i + refreshingDur/2, refreshingDur/2, 1, 0);
-                
-                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay)*i, refreshingDur/2, 0, 1);
-                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay)*i + refreshingDur/2, refreshingDur/2, 1, 0);
+                waveFormGen.Sine(channel1, (refreshingDur + pulseDelay) * i, refreshingDur, frequency, frequency);
+                waveFormGen.Sine(channel2, (refreshingDur + pulseDelay) * i, refreshingDur, frequency, frequency);
+
+                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay) * i, refreshingDur / 2, 0, 1);
+                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay) * i + refreshingDur / 2, refreshingDur / 2, 1,
+                    0);
+
+                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay) * i, refreshingDur / 2, 0, 1);
+                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay) * i + refreshingDur / 2, refreshingDur / 2, 1,
+                    0);
             }
             else
             {
@@ -228,7 +232,7 @@ public partial class MainWindowViewModel : ViewModelBase
         }
 
         waveFormGen.Encode();
-        streamer = new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat); 
+        streamer = new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat);
         streamer.Play();
 
         /*
@@ -238,7 +242,7 @@ public partial class MainWindowViewModel : ViewModelBase
             waveFormGen.Sine(frequency, frequency, alarmingDur, channel1, (alarmingDur + pulseDelay)*i);
             waveFormGen.Sine(frequency, frequency, alarmingDur, channel2, (alarmingDur + pulseDelay)*i);
         }
-        streamer = new ByteStream(waveFormGen.ByteStreams, waveFormGen.WaveFormat); 
+        streamer = new ByteStream(waveFormGen.ByteStreams, waveFormGen.WaveFormat);
         streamer.Play();
         */
     }
@@ -262,26 +266,28 @@ public partial class MainWindowViewModel : ViewModelBase
         // Console.WriteLine("Freq: " + frequency);
 
         Reset();
-        
-        
+
+
         var waveFormGen = new WaveformGen(44100, 16, 2);
-        for (int i=0; i<pulseCount; i++)
+        for (int i = 0; i < pulseCount; i++)
         {
             if (alarming)
             {
-                waveFormGen.Square(channel1, (alarmingDur + pulseDelay)*i, alarmingDur, frequency, frequency);
-                waveFormGen.Square(channel2, (alarmingDur + pulseDelay)*i, alarmingDur, frequency, frequency);
+                waveFormGen.Square(channel1, (alarmingDur + pulseDelay) * i, alarmingDur, frequency, frequency);
+                waveFormGen.Square(channel2, (alarmingDur + pulseDelay) * i, alarmingDur, frequency, frequency);
             }
             else if (refreshing)
             {
-                waveFormGen.Sine(channel1, (refreshingDur + pulseDelay)*i, refreshingDur, frequency, frequency);
-                waveFormGen.Sine(channel2, (refreshingDur + pulseDelay)*i, refreshingDur, frequency, frequency);
-                
-                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay)*i, refreshingDur/2, 0, 1);
-                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay)*i + refreshingDur/2, refreshingDur/2, 1, 0);
-                
-                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay)*i, refreshingDur/2, 0, 1);
-                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay)*i + refreshingDur/2, refreshingDur/2, 1, 0);
+                waveFormGen.Sine(channel1, (refreshingDur + pulseDelay) * i, refreshingDur, frequency, frequency);
+                waveFormGen.Sine(channel2, (refreshingDur + pulseDelay) * i, refreshingDur, frequency, frequency);
+
+                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay) * i, refreshingDur / 2, 0, 1);
+                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay) * i + refreshingDur / 2, refreshingDur / 2, 1,
+                    0);
+
+                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay) * i, refreshingDur / 2, 0, 1);
+                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay) * i + refreshingDur / 2, refreshingDur / 2, 1,
+                    0);
             }
             else
             {
@@ -290,7 +296,7 @@ public partial class MainWindowViewModel : ViewModelBase
         }
 
         waveFormGen.Encode();
-        streamer = new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat); 
+        streamer = new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat);
         streamer.Play();
 
         /*
@@ -300,116 +306,139 @@ public partial class MainWindowViewModel : ViewModelBase
             waveFormGen.Sine(frequency, frequency, alarmingDur, channel1, (alarmingDur + pulseDelay)*i);
             waveFormGen.Sine(frequency, frequency, alarmingDur, channel2, (alarmingDur + pulseDelay)*i);
         }
-        streamer = new ByteStream(waveFormGen.ByteStreams, waveFormGen.WaveFormat); 
+        streamer = new ByteStream(waveFormGen.ByteStreams, waveFormGen.WaveFormat);
         streamer.Play();
         */
     }
-    
+
     [RelayCommand]
     public void FindSweep()
     {
-
         Reset();
         var waveFormGen = new WaveformGen(44100, 16, 2);
-        for (int i=0; i<pulseCount; i++)
+        for (int i = 0; i < pulseCount; i++)
         {
             if (sweep1)
             {
-            if (alarming)
-            {
-                waveFormGen.Square(channel1, (alarmingDur + pulseDelay)*i, alarmingDur, frequency-25, frequency);
-                waveFormGen.Square(channel2, (alarmingDur + pulseDelay)*i, alarmingDur, frequency-25, frequency);
-            }
-            else if (refreshing)
-            {
-                waveFormGen.Sine(channel1, (refreshingDur + pulseDelay)*i, refreshingDur, frequency-25, frequency);
-                waveFormGen.Sine(channel2, (refreshingDur + pulseDelay)*i, refreshingDur, frequency-25, frequency);
-                
-                
-                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay)*i, refreshingDur/2, 0, 1);
-                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay)*i + refreshingDur/2, refreshingDur/2, 1, 0);
-                
-                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay)*i, refreshingDur/2, 0, 1);
-                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay)*i + refreshingDur/2, refreshingDur/2, 1, 0);
-            }
-            else
-            {
-                Console.WriteLine("Dumbass...");
-            }
+                if (alarming)
+                {
+                    waveFormGen.Square(channel1, (alarmingDur + pulseDelay) * i, alarmingDur, frequency - 25,
+                        frequency);
+                    waveFormGen.Square(channel2, (alarmingDur + pulseDelay) * i, alarmingDur, frequency - 25,
+                        frequency);
+                }
+                else if (refreshing)
+                {
+                    waveFormGen.Sine(channel1, (refreshingDur + pulseDelay) * i, refreshingDur, frequency - 25,
+                        frequency);
+                    waveFormGen.Sine(channel2, (refreshingDur + pulseDelay) * i, refreshingDur, frequency - 25,
+                        frequency);
+
+
+                    waveFormGen.Linear(channel1, (refreshingDur + pulseDelay) * i, refreshingDur / 2, 0, 1);
+                    waveFormGen.Linear(channel1, (refreshingDur + pulseDelay) * i + refreshingDur / 2,
+                        refreshingDur / 2, 1, 0);
+
+                    waveFormGen.Linear(channel2, (refreshingDur + pulseDelay) * i, refreshingDur / 2, 0, 1);
+                    waveFormGen.Linear(channel2, (refreshingDur + pulseDelay) * i + refreshingDur / 2,
+                        refreshingDur / 2, 1, 0);
+                }
+                else
+                {
+                    Console.WriteLine("Dumbass...");
+                }
             }
             else if (sweep2)
             {
-            if (alarming)
-            {
-                waveFormGen.Square(channel1, (alarmingDur + pulseDelay)*i, alarmingDur, frequency+25, frequency);
-                waveFormGen.Square(channel2, (alarmingDur + pulseDelay)*i, alarmingDur, frequency+25, frequency);
-            }
-            else if (refreshing)
-            {
-                waveFormGen.Sine(channel1, (refreshingDur + pulseDelay)*i, refreshingDur, frequency+25, frequency);
-                waveFormGen.Sine(channel2, (refreshingDur + pulseDelay)*i, refreshingDur, frequency+25, frequency);
-                
-                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay)*i, refreshingDur/2, 0, 1);
-                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay)*i + refreshingDur/2, refreshingDur/2, 1, 0);
-                
-                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay)*i, refreshingDur/2, 0, 1);
-                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay)*i + refreshingDur/2, refreshingDur/2, 1, 0);
-            }
-            else
-            {
-                Console.WriteLine("Dumbass...");
-            }
+                if (alarming)
+                {
+                    waveFormGen.Square(channel1, (alarmingDur + pulseDelay) * i, alarmingDur, frequency + 25,
+                        frequency);
+                    waveFormGen.Square(channel2, (alarmingDur + pulseDelay) * i, alarmingDur, frequency + 25,
+                        frequency);
+                }
+                else if (refreshing)
+                {
+                    waveFormGen.Sine(channel1, (refreshingDur + pulseDelay) * i, refreshingDur, frequency + 25,
+                        frequency);
+                    waveFormGen.Sine(channel2, (refreshingDur + pulseDelay) * i, refreshingDur, frequency + 25,
+                        frequency);
+
+                    waveFormGen.Linear(channel1, (refreshingDur + pulseDelay) * i, refreshingDur / 2, 0, 1);
+                    waveFormGen.Linear(channel1, (refreshingDur + pulseDelay) * i + refreshingDur / 2,
+                        refreshingDur / 2, 1, 0);
+
+                    waveFormGen.Linear(channel2, (refreshingDur + pulseDelay) * i, refreshingDur / 2, 0, 1);
+                    waveFormGen.Linear(channel2, (refreshingDur + pulseDelay) * i + refreshingDur / 2,
+                        refreshingDur / 2, 1, 0);
+                }
+                else
+                {
+                    Console.WriteLine("Dumbass...");
+                }
             }
             else if (sweep3)
             {
-            if (alarming)
-            {
-                waveFormGen.Square(channel1, (alarmingDur + pulseDelay)*i, alarmingDur, frequency, frequency-25);
-                waveFormGen.Square(channel2, (alarmingDur + pulseDelay)*i, alarmingDur, frequency, frequency-25);
-            }
-            else if (refreshing)
-            {
-                waveFormGen.Sine(channel1, (refreshingDur + pulseDelay)*i, refreshingDur, frequency, frequency-25);
-                waveFormGen.Sine(channel2, (refreshingDur + pulseDelay)*i, refreshingDur, frequency, frequency-25);
-                
-                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay)*i, refreshingDur/2, 0, 1);
-                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay)*i + refreshingDur/2, refreshingDur/2, 1, 0);
-                
-                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay)*i, refreshingDur/2, 0, 1);
-                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay)*i + refreshingDur/2, refreshingDur/2, 1, 0);
-            }
-            else
-            {
-                Console.WriteLine("Dumbass...");
-            }
-            }
-            else
-            {
-            if (alarming)
-            {
-                waveFormGen.Square(channel1, (alarmingDur + pulseDelay)*i, alarmingDur, frequency, frequency+25);
-                waveFormGen.Square(channel2, (alarmingDur + pulseDelay)*i, alarmingDur, frequency, frequency+25);
-            }
-            else if (refreshing)
-            {
-                waveFormGen.Sine(channel1, (refreshingDur + pulseDelay)*i, refreshingDur, frequency, frequency+25);
-                waveFormGen.Sine(channel2, (refreshingDur + pulseDelay)*i, refreshingDur, frequency, frequency+25);
-                
-                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay)*i, refreshingDur/2, 0, 1);
-                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay)*i + refreshingDur/2, refreshingDur/2, 1, 0);
-                
-                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay)*i, refreshingDur/2, 0, 1);
-                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay)*i + refreshingDur/2, refreshingDur/2, 1, 0);
+                if (alarming)
+                {
+                    waveFormGen.Square(channel1, (alarmingDur + pulseDelay) * i, alarmingDur, frequency,
+                        frequency - 25);
+                    waveFormGen.Square(channel2, (alarmingDur + pulseDelay) * i, alarmingDur, frequency,
+                        frequency - 25);
+                }
+                else if (refreshing)
+                {
+                    waveFormGen.Sine(channel1, (refreshingDur + pulseDelay) * i, refreshingDur, frequency,
+                        frequency - 25);
+                    waveFormGen.Sine(channel2, (refreshingDur + pulseDelay) * i, refreshingDur, frequency,
+                        frequency - 25);
+
+                    waveFormGen.Linear(channel1, (refreshingDur + pulseDelay) * i, refreshingDur / 2, 0, 1);
+                    waveFormGen.Linear(channel1, (refreshingDur + pulseDelay) * i + refreshingDur / 2,
+                        refreshingDur / 2, 1, 0);
+
+                    waveFormGen.Linear(channel2, (refreshingDur + pulseDelay) * i, refreshingDur / 2, 0, 1);
+                    waveFormGen.Linear(channel2, (refreshingDur + pulseDelay) * i + refreshingDur / 2,
+                        refreshingDur / 2, 1, 0);
+                }
+                else
+                {
+                    Console.WriteLine("Dumbass...");
+                }
             }
             else
             {
-                Console.WriteLine("Dumbass...");
-            }
+                if (alarming)
+                {
+                    waveFormGen.Square(channel1, (alarmingDur + pulseDelay) * i, alarmingDur, frequency,
+                        frequency + 25);
+                    waveFormGen.Square(channel2, (alarmingDur + pulseDelay) * i, alarmingDur, frequency,
+                        frequency + 25);
+                }
+                else if (refreshing)
+                {
+                    waveFormGen.Sine(channel1, (refreshingDur + pulseDelay) * i, refreshingDur, frequency,
+                        frequency + 25);
+                    waveFormGen.Sine(channel2, (refreshingDur + pulseDelay) * i, refreshingDur, frequency,
+                        frequency + 25);
+
+                    waveFormGen.Linear(channel1, (refreshingDur + pulseDelay) * i, refreshingDur / 2, 0, 1);
+                    waveFormGen.Linear(channel1, (refreshingDur + pulseDelay) * i + refreshingDur / 2,
+                        refreshingDur / 2, 1, 0);
+
+                    waveFormGen.Linear(channel2, (refreshingDur + pulseDelay) * i, refreshingDur / 2, 0, 1);
+                    waveFormGen.Linear(channel2, (refreshingDur + pulseDelay) * i + refreshingDur / 2,
+                        refreshingDur / 2, 1, 0);
+                }
+                else
+                {
+                    Console.WriteLine("Dumbass...");
+                }
             }
         }
 
         waveFormGen.Encode();
-        streamer = new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat); 
+        streamer = new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat);
         streamer.Play();
     }
 
@@ -419,7 +448,7 @@ public partial class MainWindowViewModel : ViewModelBase
         double[] possibleOffsets = new double[3];
         double[] rightPhaseOffsets = new double[pulseCount];
         double[] leftPhaseOffsets = new double[pulseCount];
-        
+
         // Random sequence
         /*
          * 0. 0
@@ -432,13 +461,27 @@ public partial class MainWindowViewModel : ViewModelBase
          * 7. 1
          * 8. 0
          * 9. 0
-        */
+         */
         int[] rigthRandSequence = new int[] { 0, 2, 1, 0, 2, 1, 1, 1, 0, 0 };
         int[] leftRandSequence = new int[] { 2, 1, 2, 1, 0, 2, 0, 0, 2, 1 };
 
-        possibleOffsets[0] = 0;
-        possibleOffsets[1] = (alarmingDur+pulseDelay)/4;
-        possibleOffsets[2] = (alarmingDur+pulseDelay)/2;
+        if (alarming)
+        {
+            possibleOffsets[0] = 0;
+            possibleOffsets[1] = (alarmingDur + pulseDelay) / 4;
+            possibleOffsets[2] = (alarmingDur + pulseDelay) / 2;
+        }
+
+        if (refreshing)
+        {
+            possibleOffsets[0] = 0;
+            possibleOffsets[1] = (refreshingDur + pulseDelay) / 4;
+            possibleOffsets[2] = (refreshingDur + pulseDelay) / 2;
+        }
+        else
+        {
+            Console.WriteLine("Dumb");
+        }
 
         if (phase1)
         {
@@ -450,32 +493,71 @@ public partial class MainWindowViewModel : ViewModelBase
         }
         else if (phase2)
         {
-            for (int i=0; i<pulseCount; i++)
+            for (int i = 0; i < pulseCount; i++)
             {
-                rightPhaseOffsets[i] = (alarmingDur+pulseDelay)/8;
-                leftPhaseOffsets[i] = 0;
+                if (alarming)
+                {
+                    rightPhaseOffsets[i] = (alarmingDur + pulseDelay) / 8;
+                    leftPhaseOffsets[i] = 0;
+                }
+
+                if (refreshing)
+                {
+                    rightPhaseOffsets[i] = (refreshingDur + pulseDelay) / 8;
+                    leftPhaseOffsets[i] = 0;
+                }
+                else
+                {
+                    Console.WriteLine("Dumb");
+                }
             }
         }
         else if (phase3)
         {
-            for (int i=0; i<pulseCount; i++)
+            for (int i = 0; i < pulseCount; i++)
             {
-                rightPhaseOffsets[i] = 0;
-                leftPhaseOffsets[i] = (alarmingDur+pulseDelay)/4;
+                if (alarming)
+                {
+                    rightPhaseOffsets[i] = 0;
+                    leftPhaseOffsets[i] = (alarmingDur + pulseDelay) / 4;
+                }
+
+                if (refreshing)
+                {
+                    rightPhaseOffsets[i] = 0;
+                    leftPhaseOffsets[i] = (refreshingDur + pulseDelay) / 4;
+                }
+                else
+                {
+                    Console.WriteLine("Dumb");
+                }
             }
         }
         else if (phase4)
         {
-            for (int i=0; i<pulseCount; i++)
+            for (int i = 0; i < pulseCount; i++)
             {
-                rightPhaseOffsets[i] = (alarmingDur+pulseDelay)/2;
-                leftPhaseOffsets[i] = 0;
+                if (alarming)
+                {
+                    rightPhaseOffsets[i] = (alarmingDur + pulseDelay) / 2;
+                    leftPhaseOffsets[i] = 0;
+                }
+
+                if (refreshing)
+                {
+                    rightPhaseOffsets[i] = (refreshingDur + pulseDelay) / 2;
+                    leftPhaseOffsets[i] = 0;
+                }
+                else
+                {
+                    Console.WriteLine("Dumb");
+                }
             }
         }
         else
         {
             Random rnd = new Random();
-            for (int i=0; i<pulseCount; i++)
+            for (int i = 0; i < pulseCount; i++)
             {
                 rightPhaseOffsets[i] = possibleOffsets[rigthRandSequence[i % 10]];
                 leftPhaseOffsets[i] = possibleOffsets[leftRandSequence[i % 10]];
@@ -484,107 +566,147 @@ public partial class MainWindowViewModel : ViewModelBase
 
         Reset();
         var waveFormGen = new WaveformGen(44100, 16, 2);
-        for (int i=0; i<pulseCount; i++)
+        for (int i = 0; i < pulseCount; i++)
         {
             if (sweep1)
             {
-            if (alarming)
-            {
-                waveFormGen.Square(channel1, (alarmingDur + pulseDelay) * i + rightPhaseOffsets[i], alarmingDur, frequency-25, frequency);
-                waveFormGen.Square(channel2, (alarmingDur + pulseDelay) * i + leftPhaseOffsets[i], alarmingDur, frequency-25, frequency);
-            }
-            else if (refreshing)
-            {
-                waveFormGen.Sine(channel1, (refreshingDur + pulseDelay) * i + rightPhaseOffsets[i], refreshingDur, frequency-25, frequency);
-                waveFormGen.Sine(channel2, (refreshingDur + pulseDelay) * i + leftPhaseOffsets[i], refreshingDur, frequency-25, frequency);
-                
-                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay) * i + rightPhaseOffsets[i], refreshingDur/2, 0, 1);
-                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay) * i + rightPhaseOffsets[i] + refreshingDur/2, refreshingDur/2, 1, 0);
-                
-                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay) * i + leftPhaseOffsets[i], refreshingDur/2, 0, 1);
-                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay) * i + leftPhaseOffsets[i] + refreshingDur/2, refreshingDur/2, 1, 0);
-            }
-            else
-            {
-                Console.WriteLine("Dumbass...");
-            }
+                if (alarming)
+                {
+                    waveFormGen.Square(channel1, (alarmingDur + pulseDelay) * i + rightPhaseOffsets[i], alarmingDur,
+                        frequency - 25, frequency);
+                    waveFormGen.Square(channel2, (alarmingDur + pulseDelay) * i + leftPhaseOffsets[i], alarmingDur,
+                        frequency - 25, frequency);
+                }
+                else if (refreshing)
+                {
+                    waveFormGen.Sine(channel1, (refreshingDur + pulseDelay) * i + rightPhaseOffsets[i], refreshingDur,
+                        frequency - 25, frequency);
+                    waveFormGen.Sine(channel2, (refreshingDur + pulseDelay) * i + leftPhaseOffsets[i], refreshingDur,
+                        frequency - 25, frequency);
+
+                    waveFormGen.Linear(channel1, (refreshingDur + pulseDelay) * i + rightPhaseOffsets[i],
+                        refreshingDur / 2, 0, 1);
+                    waveFormGen.Linear(channel1,
+                        (refreshingDur + pulseDelay) * i + rightPhaseOffsets[i] + refreshingDur / 2, refreshingDur / 2,
+                        1, 0);
+
+                    waveFormGen.Linear(channel2, (refreshingDur + pulseDelay) * i + leftPhaseOffsets[i],
+                        refreshingDur / 2, 0, 1);
+                    waveFormGen.Linear(channel2,
+                        (refreshingDur + pulseDelay) * i + leftPhaseOffsets[i] + refreshingDur / 2, refreshingDur / 2,
+                        1, 0);
+                }
+                else
+                {
+                    Console.WriteLine("Dumbass...");
+                }
             }
             else if (sweep2)
             {
-            if (alarming)
-            {
-                waveFormGen.Square(channel1, (alarmingDur + pulseDelay) * i + rightPhaseOffsets[i], alarmingDur, frequency+25, frequency);
-                waveFormGen.Square(channel2, (alarmingDur + pulseDelay) * i + leftPhaseOffsets[i], alarmingDur, frequency+25, frequency);
-            }
-            else if (refreshing)
-            {
-                waveFormGen.Sine(channel1, (refreshingDur + pulseDelay) * i + rightPhaseOffsets[i], refreshingDur, frequency+25, frequency);
-                waveFormGen.Sine(channel2, (refreshingDur + pulseDelay) * i + leftPhaseOffsets[i], refreshingDur, frequency+25, frequency);
-                
-                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay) * i + rightPhaseOffsets[i], refreshingDur/2, 0, 1);
-                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay) * i + rightPhaseOffsets[i] + refreshingDur/2, refreshingDur/2, 1, 0);
-                
-                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay) * i + leftPhaseOffsets[i], refreshingDur/2, 0, 1);
-                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay) * i + leftPhaseOffsets[i] + refreshingDur/2, refreshingDur/2, 1, 0);
-            }
-            else
-            {
-                Console.WriteLine("Dumbass...");
-            }
+                if (alarming)
+                {
+                    waveFormGen.Square(channel1, (alarmingDur + pulseDelay) * i + rightPhaseOffsets[i], alarmingDur,
+                        frequency + 25, frequency);
+                    waveFormGen.Square(channel2, (alarmingDur + pulseDelay) * i + leftPhaseOffsets[i], alarmingDur,
+                        frequency + 25, frequency);
+                }
+                else if (refreshing)
+                {
+                    waveFormGen.Sine(channel1, (refreshingDur + pulseDelay) * i + rightPhaseOffsets[i], refreshingDur,
+                        frequency + 25, frequency);
+                    waveFormGen.Sine(channel2, (refreshingDur + pulseDelay) * i + leftPhaseOffsets[i], refreshingDur,
+                        frequency + 25, frequency);
+
+                    waveFormGen.Linear(channel1, (refreshingDur + pulseDelay) * i + rightPhaseOffsets[i],
+                        refreshingDur / 2, 0, 1);
+                    waveFormGen.Linear(channel1,
+                        (refreshingDur + pulseDelay) * i + rightPhaseOffsets[i] + refreshingDur / 2, refreshingDur / 2,
+                        1, 0);
+
+                    waveFormGen.Linear(channel2, (refreshingDur + pulseDelay) * i + leftPhaseOffsets[i],
+                        refreshingDur / 2, 0, 1);
+                    waveFormGen.Linear(channel2,
+                        (refreshingDur + pulseDelay) * i + leftPhaseOffsets[i] + refreshingDur / 2, refreshingDur / 2,
+                        1, 0);
+                }
+                else
+                {
+                    Console.WriteLine("Dumbass...");
+                }
             }
             else if (sweep3)
             {
-            if (alarming)
-            {
-                waveFormGen.Square(channel1, (alarmingDur + pulseDelay) * i + rightPhaseOffsets[i], alarmingDur, frequency, frequency-25);
-                waveFormGen.Square(channel2, (alarmingDur + pulseDelay) * i + leftPhaseOffsets[i], alarmingDur, frequency, frequency-25);
-            }
-            else if (refreshing)
-            {
-                waveFormGen.Sine(channel1, (refreshingDur + pulseDelay) * i + rightPhaseOffsets[i], refreshingDur, frequency, frequency-25);
-                waveFormGen.Sine(channel2, (refreshingDur + pulseDelay) * i + leftPhaseOffsets[i], refreshingDur, frequency, frequency-25);
-                
-                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay) * i + rightPhaseOffsets[i], refreshingDur/2, 0, 1);
-                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay) * i + rightPhaseOffsets[i] + refreshingDur/2, refreshingDur/2, 1, 0);
-                
-                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay) * i + leftPhaseOffsets[i], refreshingDur/2, 0, 1);
-                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay) * i + leftPhaseOffsets[i] + refreshingDur/2, refreshingDur/2, 1, 0);
-            }
-            else
-            {
-                Console.WriteLine("Dumbass...");
-            }
-            }
-            else
-            {
-            if (alarming)
-            {
-                waveFormGen.Square(channel1, (alarmingDur + pulseDelay) * i + rightPhaseOffsets[i], alarmingDur, frequency, frequency+25);
-                waveFormGen.Square(channel2, (alarmingDur + pulseDelay) * i + leftPhaseOffsets[i], alarmingDur, frequency, frequency+25);
-            }
-            else if (refreshing)
-            {
-                waveFormGen.Sine(channel1, (refreshingDur + pulseDelay) * i + rightPhaseOffsets[i], refreshingDur, frequency, frequency+25);
-                waveFormGen.Sine(channel2, (refreshingDur + pulseDelay) * i + leftPhaseOffsets[i], refreshingDur, frequency, frequency+25);
-                
-                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay) * i + rightPhaseOffsets[i], refreshingDur/2, 0, 1);
-                waveFormGen.Linear(channel1, (refreshingDur + pulseDelay) * i + rightPhaseOffsets[i] + refreshingDur/2, refreshingDur/2, 1, 0);
-                
-                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay) * i + leftPhaseOffsets[i], refreshingDur/2, 0, 1);
-                waveFormGen.Linear(channel2, (refreshingDur + pulseDelay) * i + leftPhaseOffsets[i] + refreshingDur/2, refreshingDur/2, 1, 0);
+                if (alarming)
+                {
+                    waveFormGen.Square(channel1, (alarmingDur + pulseDelay) * i + rightPhaseOffsets[i], alarmingDur,
+                        frequency, frequency - 25);
+                    waveFormGen.Square(channel2, (alarmingDur + pulseDelay) * i + leftPhaseOffsets[i], alarmingDur,
+                        frequency, frequency - 25);
+                }
+                else if (refreshing)
+                {
+                    waveFormGen.Sine(channel1, (refreshingDur + pulseDelay) * i + rightPhaseOffsets[i], refreshingDur,
+                        frequency, frequency - 25);
+                    waveFormGen.Sine(channel2, (refreshingDur + pulseDelay) * i + leftPhaseOffsets[i], refreshingDur,
+                        frequency, frequency - 25);
+
+                    waveFormGen.Linear(channel1, (refreshingDur + pulseDelay) * i + rightPhaseOffsets[i],
+                        refreshingDur / 2, 0, 1);
+                    waveFormGen.Linear(channel1,
+                        (refreshingDur + pulseDelay) * i + rightPhaseOffsets[i] + refreshingDur / 2, refreshingDur / 2,
+                        1, 0);
+
+                    waveFormGen.Linear(channel2, (refreshingDur + pulseDelay) * i + leftPhaseOffsets[i],
+                        refreshingDur / 2, 0, 1);
+                    waveFormGen.Linear(channel2,
+                        (refreshingDur + pulseDelay) * i + leftPhaseOffsets[i] + refreshingDur / 2, refreshingDur / 2,
+                        1, 0);
+                }
+                else
+                {
+                    Console.WriteLine("Dumbass...");
+                }
             }
             else
             {
-                Console.WriteLine("Dumbass...");
-            }
+                if (alarming)
+                {
+                    waveFormGen.Square(channel1, (alarmingDur + pulseDelay) * i + rightPhaseOffsets[i], alarmingDur,
+                        frequency, frequency + 25);
+                    waveFormGen.Square(channel2, (alarmingDur + pulseDelay) * i + leftPhaseOffsets[i], alarmingDur,
+                        frequency, frequency + 25);
+                }
+                else if (refreshing)
+                {
+                    waveFormGen.Sine(channel1, (refreshingDur + pulseDelay) * i + rightPhaseOffsets[i], refreshingDur,
+                        frequency, frequency + 25);
+                    waveFormGen.Sine(channel2, (refreshingDur + pulseDelay) * i + leftPhaseOffsets[i], refreshingDur,
+                        frequency, frequency + 25);
+
+                    waveFormGen.Linear(channel1, (refreshingDur + pulseDelay) * i + rightPhaseOffsets[i],
+                        refreshingDur / 2, 0, 1);
+                    waveFormGen.Linear(channel1,
+                        (refreshingDur + pulseDelay) * i + rightPhaseOffsets[i] + refreshingDur / 2, refreshingDur / 2,
+                        1, 0);
+
+                    waveFormGen.Linear(channel2, (refreshingDur + pulseDelay) * i + leftPhaseOffsets[i],
+                        refreshingDur / 2, 0, 1);
+                    waveFormGen.Linear(channel2,
+                        (refreshingDur + pulseDelay) * i + leftPhaseOffsets[i] + refreshingDur / 2, refreshingDur / 2,
+                        1, 0);
+                }
+                else
+                {
+                    Console.WriteLine("Dumbass...");
+                }
             }
         }
 
         waveFormGen.Encode();
-        streamer = new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat); 
+        streamer = new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat);
         streamer.Play();
     }
-    
+
     private void Reset()
     {
         if (streamer != null) streamer.Dispose();

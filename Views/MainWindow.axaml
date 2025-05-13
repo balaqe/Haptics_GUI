@@ -146,6 +146,7 @@
                             <StackPanel HorizontalAlignment="Center">
                                 <TextBlock Text="Find Sweep" FontSize="20" FontWeight="Bold" Margin="5" HorizontalAlignment="Center"/>
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <RadioButton Content="0. Control" Margin="5" IsChecked="{Binding NoSweep}"/>
                                     <RadioButton Content="1. Low 25 to Control" Margin="5" IsChecked="{Binding Sweep1}"/>
                                     <RadioButton Content="2. High 25 to Control" Margin="5" IsChecked="{Binding Sweep2}"/>
                                     <RadioButton Content="3. Control to Low 25" Margin="5" IsChecked="{Binding Sweep3}"/>
@@ -219,6 +220,19 @@
                                         <TextBox Text="" Margin="5"/>
                                         <TextBox Text="" Margin="5"/>
                                     </StackPanel>
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <CheckBox Margin="10"/> <!-- Visual aid for logging the rounds-->
+                                    <CheckBox Margin="10"/>
+                                    <CheckBox Margin="10"/>
+                                    <CheckBox Margin="10"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <CheckBox Margin="10"/>
+                                    <CheckBox Margin="10"/>
+                                    <CheckBox Margin="10"/>
+                                    <CheckBox Margin="10"/>
                                 </StackPanel>
                             </StackPanel>
 

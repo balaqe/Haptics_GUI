@@ -15,35 +15,31 @@
 
 
 /*******************************************************************/
-int play(float *data_in, int len, int num_ch) { // waveform data, length of waveforms, number of channels
-    float waveforms[len][num_ch];
+int play(void *data_in, int len, int num_ch) { // waveform data, length of waveforms, number of channels
+    // float waveforms[len][num_ch];
     PaStreamParameters outputParameters;
     PaStream *stream;
     PaError err;
-    float buffer[FRAMES_PER_BUFFER][num_ch]; // Specify number of channels
+    // float buffer[FRAMES_PER_BUFFER][num_ch]; // Specify number of channels
     float debug_buff[len];
     int i, j, k;
     int bufferCount;
     int sample_count;
 
+    float (*waveforms)[num_ch] = (float (*)[num_ch])data_in;
+    float (*buffer)[num_ch] = (float (*)[num_ch])data_in;
 
     // DEBUG
-    FILE *wf_file;
-    wf_file = fopen("./Debug/input_wave_log.csv", "w+");
-    if (wf_file == NULL) printf("Could not open waveform_log.csv");
-    FILE *og_file;
-    og_file = fopen("./Debug/played_wave_log.csv", "w+");
-    if (wf_file == NULL) printf("Could not open original_sine_log.csv");
-    // printf("len: %d    num_ch: %d\n", len, num_ch);
+    // FILE *wf_file;
+    // wf_file = fopen("./Debug/input_wave_log.csv", "w+");
+    // if (wf_file == NULL) printf("Could not open waveform_log.csv");
+    // FILE *og_file;
+    // og_file = fopen("./Debug/played_wave_log.csv", "w+");
+    // if (wf_file == NULL) printf("Could not open original_sine_log.csv");
+    // // printf("len: %d    num_ch: %d\n", len, num_ch);
     // ** DEBUG
 
     sample_count = 0;
-    for (i=0; i<num_ch; i++) {
-        for (j=0; j<len; j++) {
-            waveforms[j][i] = data_in[sample_count];
-            sample_count++;
-        }
-    }
 
 
     err = Pa_Initialize();
@@ -76,35 +72,36 @@ int play(float *data_in, int len, int num_ch) { // waveform data, length of wave
     if( err != paNoError ) goto error;
 
     sample_count = 0;
-    bufferCount = len / FRAMES_PER_BUFFER;
+    // bufferCount = len / FRAMES_PER_BUFFER;
 
-    for( i=0; i < bufferCount; i++ ) {
-        for( j=0; j < FRAMES_PER_BUFFER; j++ ) {
-            for ( k=0; k<num_ch; k++ ) {
-                buffer[j][k] = waveforms[sample_count][k];
-            }
+    // for( i=0; i < bufferCount; i++ ) {
+    //     for( j=0; j < FRAMES_PER_BUFFER; j++ ) {
+    //         for ( k=0; k<num_ch; k++ ) {
+    //             buffer[j][k] = waveforms[sample_count][k];
+    //         }
             
-            // DEBUG
-            debug_buff[sample_count] = buffer[j][DEBUG_CH];
-            // ** DEBUG
+    //         // DEBUG
+    //         debug_buff[sample_count] = buffer[j][DEBUG_CH];
+    //         // ** DEBUG
 
-            sample_count++;
-        }
+    //         sample_count++;
+    //     }
 
-        err = Pa_WriteStream( stream, buffer, FRAMES_PER_BUFFER );
-        if( err != paNoError ) goto error;
-    }  
+    //     err = Pa_WriteStream( stream, buffer, FRAMES_PER_BUFFER );
+    //     if( err != paNoError ) goto error;
+    // }  
+    err = Pa_WriteStream( stream, buffer, len);
     Pa_Sleep(300);
 
     // DEBUG
-    for (j=0; j<len; j++) {
-        fprintf(wf_file, "%d,%.2f\n", j, waveforms[j][DEBUG_CH]);
-    }
-    for (j=0; j<sample_count; j++) {
-        fprintf(og_file, "%d,%.2f\n", j, debug_buff[j]);
-    }
-    fclose(wf_file);
-    fclose(og_file);
+    // for (j=0; j<len; j++) {
+    //     fprintf(wf_file, "%d,%.2f\n", j, waveforms[j][DEBUG_CH]);
+    // }
+    // for (j=0; j<sample_count; j++) {
+    //     fprintf(og_file, "%d,%.2f\n", j, debug_buff[j]);
+    // }
+    // fclose(wf_file);
+    // fclose(og_file);
     // ** DEBUG
 
     err = Pa_StopStream( stream );
@@ -130,8 +127,8 @@ error:
     Pa_Terminate();
 
     // DEBUG
-    fclose(wf_file);
-    fclose(og_file);
+    // fclose(wf_file);
+    // fclose(og_file);
     // ** DEBUG
 
     return err; 

@@ -516,6 +516,33 @@ public partial class MainWindowViewModel : ViewModelBase
             }
         }
 
+        play(transferBuff, sampleCount, waveCount);int writtenSamples = 0;
+        for (int i=0; i<waveCount; i++)
+        {
+            for (int j=0; j<sampleCount; j++)
+            {
+                switch (waveFormGen.BitDepth)
+                {
+                    case 8:
+                        var sample8 = BitConverter.ToChar(waveFormGen.ByteStreams[i], j * bitDepthDivider);
+                        transferBuff[writtenSamples] = sample8 / (float)normalMax;
+                        break;
+                    case 16:
+                        var sample16 = BitConverter.ToInt16(waveFormGen.ByteStreams[i], j * bitDepthDivider);
+                        transferBuff[writtenSamples] = sample16 / (float)normalMax;
+
+                        break;
+                    default: // 32 bit
+                        var sample32 = BitConverter.ToInt32(waveFormGen.ByteStreams[i], j * bitDepthDivider);
+                        // transferBuff[j][i] = sample32 / (float)normalMax;
+                        transferBuff[writtenSamples] = sample32 / (float)normalMax;
+                        break;
+                }
+
+                writtenSamples++;
+            }
+        }
+
         play(transferBuff, sampleCount, waveCount);
     }
 }

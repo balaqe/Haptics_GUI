@@ -28,6 +28,7 @@ int play(void *data_in, int len, int num_ch) { // waveform data, length of wavef
 
     float (*waveforms)[num_ch] = (float (*)[num_ch])data_in;
     float (*buffer)[num_ch] = (float (*)[num_ch])data_in;
+    // float (*buffer)[num_ch] = data_in;
 
     // DEBUG
     // FILE *wf_file;
@@ -62,6 +63,7 @@ int play(void *data_in, int len, int num_ch) { // waveform data, length of wavef
               &outputParameters,
               SAMPLE_RATE,
               FRAMES_PER_BUFFER,
+            //   len,
               paClipOff,      /* we won't output out of range samples so don't bother clipping them */
               NULL, /* no callback, use blocking API */
               NULL ); /* no callback, so no callback userData */

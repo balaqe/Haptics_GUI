@@ -36,6 +36,7 @@
 
 
             <StackPanel>
+                <Button Content="Temp button" Command="{Binding Breathing}"></Button>
                 <StackPanel HorizontalAlignment="Center">
                     <Border Margin="5" BorderBrush="Black" BorderThickness="1" CornerRadius="7">
                         <Grid>

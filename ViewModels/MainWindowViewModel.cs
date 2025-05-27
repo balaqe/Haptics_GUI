@@ -1,4 +1,8 @@
 using System;
+using System.Collections.Generic;
+using System.Threading;
+using Avalonia.LogicalTree;
+using Avalonia.Rendering;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Haptics_GUI.Models;
@@ -47,6 +51,31 @@ public partial class MainWindowViewModel : ViewModelBase
 
     [ObservableProperty] public bool refreshing = true;
     [ObservableProperty] public bool alarming = false;
+
+
+    private readonly double resourcePulseLength = 0.2; 
+    
+    private readonly int resourcePulseCount = 3;
+    private readonly double resourcePulseDelay = 0.2; 
+    
+    private readonly int resourceStartingFrequency = 75;
+    private readonly int resourceEndingFrequency = 100;
+    
+    
+    
+    
+    
+    
+    [ObservableProperty] public bool resourceMode = false;
+    [ObservableProperty] public bool declutterMode = false;
+    [ObservableProperty] public bool breathingMode = true;
+
+    // Hook into this one for breathing up and down presses
+    [ObservableProperty] public int breathingVariable = 0;
+
+    private bool PlayingMutex = false;
+    
+    
 
     private AudioFileReader audioFile;
     private WasapiOut audioOut;
@@ -714,6 +743,140 @@ public partial class MainWindowViewModel : ViewModelBase
         waveFormGen.Encode();
         streamer = new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat);
         streamer.Play();
+    }
+
+
+
+    [RelayCommand]
+    private void userModePlay()
+    {
+        for (;;)
+        {
+            while (PlayingMutex);
+            if (breathingMode)
+            {
+                Breathing(); 
+            }
+            else if (resourceMode)
+            {
+            
+            }
+            else if (declutterMode)
+            {
+            
+            }
+        }
+    }
+
+
+    public double delayFunc(double dur, double i)
+    {
+        double t_0 = 0.5 * dur;
+        double t_1 = dur;
+
+        double k = -(1 / (t_1 - t_0)) * Math.Log(1 / 0.90 - 1);
+
+        var delayFuncValue = (1 / (1 + Math.Exp(-k * (i - t_0)))) * (1 - (1 / (1 + Math.Exp(-k * (i - t_0)))));
+        //var delayFuncValue = (1 / (1 + Math.Exp(-k * (i - t_0))));
+
+        double offset = 0.5; // Slowest tick in ms
+        double A = 1.4;
+
+        return -1 * A * delayFuncValue + offset;
+    }
+
+    [RelayCommand]
+    public void Breathing()
+    {
+        PlayingMutex = true;
+        Reset();
+        
+        var cycles = 7;
+        var ticks = 15;
+
+        
+        
+        // DEBUGGING
+        List<double> delayTemp = new List<double>();
+        for (int i = 0; i < ticks; i++)
+        {
+            delayTemp.Add(delayFunc(ticks, i));
+        }
+        
+        
+
+        int accum = 0; 
+        
+        for (int i = 0; i < ticks; i++)
+        {
+            var waveFormGen = new WaveformGen(44100, 16, 2);
+            waveFormGen.Sine(channel1, 0, 0.01 * cycles, 100, 100);
+            waveFormGen.Sine(channel2, 0, 0.01 * cycles, 100, 100);
+
+            int latency = (int)(1000 * delayFunc(ticks, i));
+            accum += latency;
+            
+            waveFormGen.Encode();
+            streamer = new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat, 80);
+            streamer.Play();
+            Thread.Sleep(latency);
+            Reset();
+        }
+        Console.WriteLine("Length: " + accum + "\n");
+        accum = 0;
+
+        double burstPerMinute = 40 + 10 * breathingVariable;
+        for (int i = 0; i < 7; i++)
+        {   
+            var waveFormGen = new WaveformGen(44100, 16, 2);
+            waveFormGen.Sine(channel1, 0, 0.01 * cycles, 100, 100);
+            waveFormGen.Sine(channel2, 0, 0.01 * cycles, 100, 100);
+
+            int delay = (int)(1000 * (1 / (burstPerMinute/60)));
+            accum += delay;
+            
+            waveFormGen.Encode();
+            streamer = new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat, 80);
+            streamer.Play();
+            Thread.Sleep(delay);
+            Reset();
+        }
+        Console.WriteLine("Length: " + accum + "\n");
+        PlayingMutex = false;
+    }
+
+    public void Resource()
+    {
+        PlayingMutex = true;
+        Reset();
+                
+        var cycles = 7;
+        int accum = 0; 
+        
+        double burstPerMinute = 40 + 10 * breathingVariable;
+        for (int i = 0; i < 7; i++)
+        {   
+            var waveFormGen = new WaveformGen(44100, 16, 2);
+
+            for (int j = 0; j < resourcePulseCount; j++)
+            {
+                waveFormGen.Sine(channel1, (0.2 + resourcePulseDelay) * j, 0.2, resourceStartingFrequency, resourceStartingFrequency);
+            }
+        
+            
+            
+            
+            int delay = (int)(1000 * (1 / (burstPerMinute/60)));
+            accum += delay;
+                    
+            waveFormGen.Encode();
+            streamer = new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat, delay - 10);
+            streamer.Play();
+            Thread.Sleep(delay);
+            Reset();
+        }
+        Console.WriteLine("Length: " + accum + "\n");
+        PlayingMutex = false;
     }
 
     private void Reset()

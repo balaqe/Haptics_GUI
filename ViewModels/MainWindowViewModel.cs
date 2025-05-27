@@ -53,22 +53,26 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty] public bool alarming = false;
 
 
-    private readonly double resourcePulseLength = 0.2; 
-    
+    private readonly double resourcePulseLength = 0.5; 
     private readonly int resourcePulseCount = 3;
     private readonly double resourcePulseDelay = 0.2; 
-    
     private readonly int resourceStartingFrequency = 75;
     private readonly int resourceEndingFrequency = 100;
     
-    
-    
+    private readonly double declutterPulseLength = 0.2; 
+    private readonly int declutterPulseCount = 5;
+    private readonly double declutterPulseDelay = 0.1; 
+    private readonly int declutterStartingFrequency = 125;
+    private readonly int declutterEndingFrequency = 150;
+
+
+    private Thread userModeThread; 
     
     
     
     [ObservableProperty] public bool resourceMode = false;
     [ObservableProperty] public bool declutterMode = false;
-    [ObservableProperty] public bool breathingMode = true;
+    [ObservableProperty] public bool breathingMode = false;
 
     // Hook into this one for breathing up and down presses
     [ObservableProperty] public int breathingVariable = 0;
@@ -141,6 +145,10 @@ public partial class MainWindowViewModel : ViewModelBase
         // squareAmp = 0.81;
 
         // FunctionDictionary = new Dictionary<string, ByteStream>();
+        
+        
+        userModeThread = new Thread(userModePlay);
+        userModeThread.Start();
     }
 
 
@@ -747,8 +755,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
 
 
-    [RelayCommand]
-    private void userModePlay()
+    public void userModePlay()
     {
         for (;;)
         {
@@ -759,12 +766,55 @@ public partial class MainWindowViewModel : ViewModelBase
             }
             else if (resourceMode)
             {
-            
+                Resource();        
             }
             else if (declutterMode)
             {
-            
+                Declutter();
             }
+            Thread.Sleep(1000);
+        }
+    }
+
+    [RelayCommand]
+    public void ResourceButtonPressed()
+    {
+        breathingMode = false;
+        resourceMode = !resourceMode;
+        declutterMode = false;
+    }
+    
+    [RelayCommand]
+    public void BreathingButtonPressed()
+    {
+        breathingMode = !breathingMode;
+        resourceMode = false;
+        declutterMode = false;
+    }
+    
+    [RelayCommand]
+    public void DeclutterButtonPressed()
+    {
+        breathingMode = false;
+        resourceMode = false;
+        declutterMode = !declutterMode;
+    }
+
+    [RelayCommand]
+    public void BreathingUpButtonPressed()
+    {
+        if (breathingVariable < 3)
+        {
+            breathingVariable++;
+        }
+    }
+    
+    [RelayCommand]
+    public void BreathingDownButtonPressed()
+    {
+        if (breathingVariable > 0)
+        {
+            breathingVariable--;
         }
     }
 
@@ -785,7 +835,6 @@ public partial class MainWindowViewModel : ViewModelBase
         return -1 * A * delayFuncValue + offset;
     }
 
-    [RelayCommand]
     public void Breathing()
     {
         PlayingMutex = true;
@@ -850,21 +899,83 @@ public partial class MainWindowViewModel : ViewModelBase
         PlayingMutex = true;
         Reset();
                 
-        var cycles = 7;
         int accum = 0; 
         
-        double burstPerMinute = 40 + 10 * breathingVariable;
-        for (int i = 0; i < 7; i++)
+        //double burstPerMinute = 40 + 10 * breathingVariable;
+        double burstPerMinute = 30;
+        for (int i = 0; i < 1; i++)
         {   
             var waveFormGen = new WaveformGen(44100, 16, 2);
 
             for (int j = 0; j < resourcePulseCount; j++)
             {
-                waveFormGen.Sine(channel1, (0.2 + resourcePulseDelay) * j, 0.2, resourceStartingFrequency, resourceStartingFrequency);
+                double burstLength = (resourcePulseLength + resourcePulseDelay) * (1 + 1.0 / 4.0);
+                
+                /*
+                 * if j = 0 then 0.175
+                 * if j = 1 then 0.875
+                 * diff is 0.7 which is 0.5 + 0.2
+                 *
+                 *
+                 * 
+                 */
+                
+                
+                
+                
+                
+                waveFormGen.Sine(channel1, (resourcePulseLength + resourcePulseDelay) * (1.0 / 4.0), 
+                    resourcePulseLength, resourceStartingFrequency, resourceEndingFrequency);
+                waveFormGen.Sine(channel2, (resourcePulseLength + resourcePulseDelay) * (0.0 / 4.0), 
+                    resourcePulseLength, resourceStartingFrequency, resourceEndingFrequency);
+                
+                waveFormGen.Linear(channel1, (resourcePulseLength + resourcePulseDelay) * (1.0 / 4.0),
+                    resourcePulseLength / 2, 0, 1);
+                waveFormGen.Linear(channel1, (resourcePulseLength + resourcePulseDelay) * (1.0 / 4.0) + resourcePulseLength / 2, 
+                    resourcePulseLength / 2, 1, 0);
+                
+                waveFormGen.Linear(channel2, (resourcePulseLength + resourcePulseDelay) * (0.0 / 4.0),
+                    resourcePulseLength / 2, 0, 1);
+                waveFormGen.Linear(channel2, (resourcePulseLength + resourcePulseDelay) * (0.0 / 4.0) + resourcePulseLength / 2, 
+                    resourcePulseLength / 2, 1, 0);
+                
+                waveFormGen.Encode();
+                streamer = new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat, (int)(burstLength * 1000));
+                streamer.Play();
+                Thread.Sleep((int)((resourcePulseLength + resourcePulseDelay) * 1000));
+                Reset();
             }
+            
+            //int delay = (int)(1000 * (1 / (burstPerMinute/60)));
+            int delay = (int)(0.9 * 1000); // 25 bpm, 1/(25/60) - (0.5+0.2)*3 = 0.3
+            accum += delay;
+                    
+            Thread.Sleep(delay);
+        }
+        Console.WriteLine("Length: " + accum + "\n");
+        PlayingMutex = false;
+    }
+
+    public void Declutter()
+    {
+        PlayingMutex = true;
+        Reset();
+                
+        int accum = 0; 
         
-            
-            
+        //double burstPerMinute = 40 + 10 * breathingVariable;
+        double burstPerMinute = 30;
+        for (int i = 0; i < 1; i++)
+        {   
+            var waveFormGen = new WaveformGen(44100, 16, 2);
+
+            for (int j = 0; j < declutterPulseCount; j++)
+            {
+                waveFormGen.Square(channel1, (declutterPulseLength + declutterPulseDelay) * (j + 1.0 / 2.0), 
+                    declutterPulseLength, declutterStartingFrequency, declutterEndingFrequency);
+                waveFormGen.Square(channel2, (declutterPulseLength + declutterPulseDelay) * (j + 0.0 / 2.0), 
+                    declutterPulseLength, declutterStartingFrequency, declutterEndingFrequency);
+            }
             
             int delay = (int)(1000 * (1 / (burstPerMinute/60)));
             accum += delay;

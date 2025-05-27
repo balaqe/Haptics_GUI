@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
-using NAudio.Wave.SampleProviders;
 
 namespace Haptics_GUI.Models;
 
@@ -26,6 +25,7 @@ public class ByteStream
         }
 
         ArgumentNullException.ThrowIfNull(waveFormat);
+        /*
         if (waveFormat.Channels != sampleArrays.Count)
         {
             throw new ArgumentException($"Number of channels do not match: " +
@@ -33,6 +33,7 @@ public class ByteStream
                                         $" != " +
                                         $"waveFormat.Channels = {waveFormat.Channels}");
         }
+        */
 
         // If WaveFormat is not passed in default will be 44.1kHz and mono
         WaveFormat = waveFormat;
@@ -41,10 +42,10 @@ public class ByteStream
         foreach (var samples in sampleArrays)
         {
             Waves.Add(new RawSourceWaveStream(new MemoryStream(samples), 
-                new WaveFormat(WaveFormat.SampleRate, 1)));
+                new WaveFormat(WaveFormat.SampleRate, WaveFormat.BitsPerSample, 1)));
         }
         WaveProvider = new MultiplexingWaveProvider(Waves, WaveFormat.Channels);
-        WasapiOut = new WasapiOut(AudioClientShareMode.Exclusive, true, 500);
+        WasapiOut = new WasapiOut(AudioClientShareMode.Exclusive, true, 2000);//(int)(1/waveFormat.SampleRate * (double)sampleArrays[0].Length)*1000);
         WasapiOut.Init(WaveProvider);
     }
 

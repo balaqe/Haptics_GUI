@@ -2,20 +2,19 @@ using System;
 
 namespace Haptics_GUI.Models.Functions;
 
-public class Square : Function
+public class Square(
+    Format inFormat,
+    double inStartFreq,
+    double inEndFreq,
+    double inDur,
+    double inStartPhase)
+    : Function(inFormat, inStartFreq, inEndFreq, inDur, inStartPhase)
 {
-    int zeroCrossing= 0;
-    int period;
-    public Square(double inFreq, double inDur, int inChannel, int inSamplingRate, int inBitDepth)
-    : base(inFreq, inDur, inChannel, inSamplingRate, inBitDepth)
+    public override double Func(int i)
     {
-        // period = (int)(inFreq/inSamplingRate); // Calculate period
-        period = (int)(inSamplingRate/inFreq);
-    }
-
-    public override double Func(double inFreq, int inSamplingRate, int i)
-    {
-        if (i % (period/2) == 0) zeroCrossing++;
-        return Math.Pow(-1, zeroCrossing);
+        var phase = startPhase + 2 * Math.PI * i *
+            (((endFreq - startFreq) * i) / (2 * format.SamplingRate * sampleCount) + startFreq / format.SamplingRate);
+        endPhase = phase % (2 * Math.PI);
+        return Math.Sign(Math.Sin(phase)) == 1 ? 0.8 : -0.8; // Formula for linear chirp
     }
 }

@@ -145,9 +145,12 @@ public partial class MainWindowViewModel : ViewModelBase
         // squareAmp = 0.81;
 
         // FunctionDictionary = new Dictionary<string, ByteStream>();
-        
-        
-        userModeThread = new Thread(userModePlay);
+
+
+        userModeThread = new Thread(userModePlay)
+        {
+            IsBackground = true,
+        };
         userModeThread.Start();
     }
 

@@ -49,6 +49,38 @@ public class ByteStream
         WasapiOut.Init(WaveProvider);
     }
 
+    public ByteStream(List<byte[]> sampleArrays, WaveFormat waveFormat, int latency)
+    {
+        if(latency < 0) throw new ArgumentOutOfRangeException(nameof(latency));
+        if (waveFormat == null)
+        {
+            WaveFormat = new WaveFormat();
+        }
+        else
+        {
+            WaveFormat = waveFormat;
+        }
+        
+        Waves = [];
+        foreach (var samples in sampleArrays)
+        {
+            Waves.Add(new RawSourceWaveStream(new MemoryStream(samples), 
+                new WaveFormat(WaveFormat.SampleRate, WaveFormat.BitsPerSample, 1)));
+        }
+        WaveProvider = new MultiplexingWaveProvider(Waves, WaveFormat.Channels);
+
+        if (latency > 2000)
+        {
+            WasapiOut = new WasapiOut(AudioClientShareMode.Exclusive, true, 2000);//(int)(1/waveFormat.SampleRate * (double)sampleArrays[0].Length)*1000);
+        }
+        else
+        {
+            WasapiOut = new WasapiOut(AudioClientShareMode.Exclusive, true, latency);
+        }
+
+        WasapiOut.Init(WaveProvider);
+    }
+
     public void Play()
     {
         WasapiOut.Play();

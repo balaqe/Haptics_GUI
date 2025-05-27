@@ -14,6 +14,7 @@ public abstract class Function
     protected int sampleCount;
     public double[] rawSamples;
 
+
     
     protected Function(Format inFormat, double inStartFreq, 
         double inEndFreq, double inDur, double inStartPhase)

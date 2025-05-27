@@ -2,15 +2,19 @@ using System;
 
 namespace Haptics_GUI.Models.Functions;
 
-public class Sine : Function
+public class Sine(
+    Format inFormat,
+    double inStartFreq,
+    double inEndFreq,
+    double inDur,
+    double inStartPhase)
+    : Function(inFormat, inStartFreq, inEndFreq, inDur, inStartPhase)
 {
-    public Sine(double inFreq, double inDur, int inChannel, int inSamplingRate, int inBitDepth)
-    : base(inFreq, inDur, inChannel, inSamplingRate, inBitDepth)
-    {}
-
-    public override double Func(double inFreq, int inSamplingRate, int i)
+    public override double Func(int i)
     {
-        double omega = 2*Math.PI*inFreq/(double)inSamplingRate; // Calculate period: 2*pi / omega
-        return Math.Sin(omega * i);
+        var phase = startPhase + 2 * Math.PI * i *
+            (((endFreq - startFreq) * i) / (2 * format.SamplingRate * sampleCount) + startFreq / format.SamplingRate);
+        endPhase = phase % (2 * Math.PI);
+        return Math.Sin(phase); // Formula for linear chirp
     }
 }

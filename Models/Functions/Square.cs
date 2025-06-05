@@ -15,6 +15,6 @@ public class Square(
         var phase = startPhase + 2 * Math.PI * i *
             (((endFreq - startFreq) * i) / (2 * format.SamplingRate * sampleCount) + startFreq / format.SamplingRate);
         endPhase = phase % (2 * Math.PI);
-        return Math.Sign(Math.Sin(phase)) == 1 ? 0.8 : -0.8; // Formula for linear chirp
+        return Math.Sign(Math.Sin(phase)) == 1 ? 0.7 : -0.7; // Formula for linear chirp
     }
 }

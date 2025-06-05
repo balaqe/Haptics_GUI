@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using Avalonia.LogicalTree;
 using Avalonia.Rendering;
@@ -76,6 +77,8 @@ public partial class MainWindowViewModel : ViewModelBase
 
     // Hook into this one for breathing up and down presses
     [ObservableProperty] public int breathingVariable = 0;
+    [ObservableProperty] public int resourceVariable = 0;
+    [ObservableProperty] public int declutterVariable = 0;
 
     private bool PlayingMutex = false;
     
@@ -820,6 +823,44 @@ public partial class MainWindowViewModel : ViewModelBase
             breathingVariable--;
         }
     }
+    
+    
+    [RelayCommand]
+    public void ResourceUpButtonPressed()
+    {
+        if (resourceVariable < 5)
+        {
+            resourceVariable++;
+        }
+    }
+    
+    [RelayCommand]
+    public void ResourceDownButtonPressed()
+    {
+        if (resourceVariable > 0)
+        {
+            resourceVariable--;
+        }
+    }
+    
+    
+    [RelayCommand]
+    public void DeclutterUpButtonPressed()
+    {
+        if (declutterVariable < 3)
+        {
+            declutterVariable++;
+        }
+    }
+    
+    [RelayCommand]
+    public void DeclutterDownButtonPressed()
+    {
+        if (declutterVariable > 0)
+        {
+            declutterVariable--;
+        }
+    }
 
 
     public double delayFunc(double dur, double i)
@@ -837,6 +878,8 @@ public partial class MainWindowViewModel : ViewModelBase
 
         return -1 * A * delayFuncValue + offset;
     }
+    
+    
 
     public void Breathing()
     {
@@ -855,6 +898,11 @@ public partial class MainWindowViewModel : ViewModelBase
             delayTemp.Add(delayFunc(ticks, i));
         }
         
+         string filePath = "/Users/boti/py/breathing_ch1.csv";
+        //StreamWriter writer = new StreamWriter(filePath);
+        List<double> final = new List<double>();
+        
+        
         
 
         int accum = 0; 
@@ -864,18 +912,37 @@ public partial class MainWindowViewModel : ViewModelBase
             var waveFormGen = new WaveformGen(44100, 16, 2);
             waveFormGen.Sine(channel1, 0, 0.01 * cycles, 100, 100);
             waveFormGen.Sine(channel2, 0, 0.01 * cycles, 100, 100);
+            
+                    
+            
+            
+            
+            
 
             int latency = (int)(1000 * delayFunc(ticks, i));
             accum += latency;
+
             
+                    
             waveFormGen.Encode();
             streamer = new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat, 80);
             streamer.Play();
             Thread.Sleep(latency);
             Reset();
+            /*
+            */
+            foreach (double value in waveFormGen.Channels[0].BakedSamples)
+            {
+                final.Add(value);
+            }
+            for (int w = 0; w < (latency - 80) * 44.1; w++)
+            {
+                final.Add(0);
+            }
         }
         Console.WriteLine("Length: " + accum + "\n");
         accum = 0;
+        
 
         double burstPerMinute = 40 + 10 * breathingVariable;
         for (int i = 0; i < 7; i++)
@@ -892,9 +959,30 @@ public partial class MainWindowViewModel : ViewModelBase
             streamer.Play();
             Thread.Sleep(delay);
             Reset();
+            /*
+            */
+            
+            
+            foreach (double value in waveFormGen.Channels[0].BakedSamples)
+            {
+                final.Add(value);
+            }
+            for (int w = 0; w < (delay - 80) * 44.1; w++)
+            {
+                final.Add(0);
+            }
         }
         Console.WriteLine("Length: " + accum + "\n");
         PlayingMutex = false;
+
+        int counting = 0;
+        foreach (double value in final)
+        {
+            //writer.WriteLine(counting + "," + value);
+            counting++;
+        }
+        
+        //writer.Close();
     }
 
     public void Resource()
@@ -904,15 +992,20 @@ public partial class MainWindowViewModel : ViewModelBase
                 
         int accum = 0; 
         
+        
+        string filePath = "/Users/boti/py/resource_ch1.csv";
+        //StreamWriter writer = new StreamWriter(filePath);
+        List<double> final = new List<double>();
+        
         //double burstPerMinute = 40 + 10 * breathingVariable;
         double burstPerMinute = 30;
         for (int i = 0; i < 1; i++)
         {   
-            var waveFormGen = new WaveformGen(44100, 16, 2);
 
             for (int j = 0; j < resourcePulseCount; j++)
             {
                 double burstLength = (resourcePulseLength + resourcePulseDelay) * (1 + 1.0 / 4.0);
+                var waveFormGen = new WaveformGen(44100, 16, 2);
                 
                 /*
                  * if j = 0 then 0.175
@@ -947,27 +1040,62 @@ public partial class MainWindowViewModel : ViewModelBase
                 streamer.Play();
                 Thread.Sleep((int)((resourcePulseLength + resourcePulseDelay) * 1000));
                 Reset();
+                /*
+                */
+                
+                foreach (double value in waveFormGen.Channels[1].BakedSamples)
+                {
+                    final.Add(value);
+                }
+            
+                
+                for (int w = 0; w < (resourcePulseLength + resourcePulseDelay - burstLength) * 44100; w++)
+                {
+                    final.Add(0);
+                }
             }
             
             //int delay = (int)(1000 * (1 / (burstPerMinute/60)));
-            int delay = (int)(0.9 * 1000); // 25 bpm, 1/(25/60) - (0.5+0.2)*3 = 0.3
+            int delay = (int)((0.9 + resourceVariable * 0.1) * 1000); // 25 bpm, 1/(25/60) - (0.5+0.2)*3 = 0.3
             accum += delay;
                     
-            Thread.Sleep(delay);
+           Thread.Sleep(delay);
+            
+            
+            for (int w = 0; w <  delay * 44.1; w++)
+            {
+                final.Add(0);
+            }
         }
         Console.WriteLine("Length: " + accum + "\n");
         PlayingMutex = false;
+
+        int counting = 0;
+        foreach (double value in final)
+        {
+            //writer.WriteLine(counting + "," + value);
+            counting++;
+        }
+        //writer.Flush();
+        
+        
+        //writer.Close();
     }
 
     public void Declutter()
     {
         PlayingMutex = true;
         Reset();
+        
+        
+        string filePath = "/Users/boti/py/declutter_ch1.csv";
+        //StreamWriter writer = new StreamWriter(filePath);
+        List<double> final = new List<double>();
                 
         int accum = 0; 
         
-        //double burstPerMinute = 40 + 10 * breathingVariable;
-        double burstPerMinute = 30;
+        double burstPerMinute = 20 + 5 * declutterVariable;
+        //double burstPerMinute = 30;
         for (int i = 0; i < 1; i++)
         {   
             var waveFormGen = new WaveformGen(44100, 16, 2);
@@ -988,9 +1116,35 @@ public partial class MainWindowViewModel : ViewModelBase
             streamer.Play();
             Thread.Sleep(delay);
             Reset();
+            /*
+            */
+            
+            
+                foreach (double value in waveFormGen.Channels[1].BakedSamples)
+                {
+                    final.Add(value);
+                }
+            
+                
+                for (int w = 0; w < (delay * 44.1) - waveFormGen.Channels[1].BakedSamples.Length; w++)
+                {
+                    final.Add(0);
+                }
         }
         Console.WriteLine("Length: " + accum + "\n");
         PlayingMutex = false;
+        
+        
+        int counting = 0;
+        foreach (double value in final)
+        {
+            //writer.WriteLine(counting + "," + value);
+            counting++;
+        }
+        //writer.Flush();
+        
+        
+        //writer.Close();
     }
 
     private void Reset()

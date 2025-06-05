@@ -780,6 +780,10 @@ public partial class MainWindowViewModel : ViewModelBase
             }
             Thread.Sleep(1000);
         }
+
+        waveFormGen.Encode();
+        streamer = new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat);
+        streamer.Play();
     }
 
     [RelayCommand]
@@ -824,7 +828,6 @@ public partial class MainWindowViewModel : ViewModelBase
         }
     }
     
-    
     [RelayCommand]
     public void ResourceUpButtonPressed()
     {
@@ -833,7 +836,7 @@ public partial class MainWindowViewModel : ViewModelBase
             resourceVariable++;
         }
     }
-    
+
     [RelayCommand]
     public void ResourceDownButtonPressed()
     {
@@ -860,6 +863,8 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             declutterVariable--;
         }
+        Console.WriteLine("Length: " + accum + "\n");
+        PlayingMutex = false;
     }
 
 

@@ -780,10 +780,6 @@ public partial class MainWindowViewModel : ViewModelBase
             }
             Thread.Sleep(1000);
         }
-
-        waveFormGen.Encode();
-        streamer = new ByteStream(waveFormGen.ByteStreams, waveFormGen.waveFormat);
-        streamer.Play();
     }
 
     [RelayCommand]
@@ -863,8 +859,6 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             declutterVariable--;
         }
-        Console.WriteLine("Length: " + accum + "\n");
-        PlayingMutex = false;
     }
 
 
@@ -1061,7 +1055,7 @@ public partial class MainWindowViewModel : ViewModelBase
             }
             
             //int delay = (int)(1000 * (1 / (burstPerMinute/60)));
-            int delay = (int)((0.9 + resourceVariable * 0.1) * 1000); // 25 bpm, 1/(25/60) - (0.5+0.2)*3 = 0.3
+            int delay = (int)((1.4 - resourceVariable * 0.1) * 1000); // 25 bpm, 1/(25/60) - (0.5+0.2)*3 = 0.3
             accum += delay;
                     
            Thread.Sleep(delay);

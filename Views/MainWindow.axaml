@@ -41,6 +41,7 @@
                     Height="60"
                     CornerRadius="30"
                     Background="#dadada"
+                    Command="{Binding ResourceUpButtonPressed}"
                     
                     >
                     <Button.Content>
@@ -70,6 +71,7 @@
                     Height="60"
                     CornerRadius="30"
                     Background="#dadada"
+                    Command="{Binding ResourceDownButtonPressed}"
                     >
                     <Button.Content>
                         <Image Source="avares://Haptics_GUI/Assets/down_arrow.png" 
@@ -154,6 +156,7 @@
                     Height="60"
                     CornerRadius="30"
                     Background="#dadada"
+                    Command="{Binding DeclutterUpButtonPressed}"
                     >
                     <Button.Content>
                         <Image Source="avares://Haptics_GUI/Assets/up_arrow.png" 
@@ -181,6 +184,7 @@
                     Height="60"
                     CornerRadius="30"
                     Background="#dadada"
+                    Command="{Binding DeclutterDownButtonPressed}"
                     >
                     <Button.Content>
                         <Image Source="avares://Haptics_GUI/Assets/down_arrow.png" 
